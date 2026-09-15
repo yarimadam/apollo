@@ -2,7 +2,7 @@
 	default_sni {$INTERNAL_IP}
 }
 
-{$INTERNAL_IP} {
+{$INTERNAL_IP}:8443 {
 	tls internal
 	reverse_proxy portainer:9000
 }
