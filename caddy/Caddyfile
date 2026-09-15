@@ -9,10 +9,30 @@
 
 {$AIOSTREAMS_DOMAIN} {
 	{$CADDY_EXTERNAL_TLS}
-	reverse_proxy aiostreams:3000
+	header X-Robots-Tag "noindex, nofollow, noarchive"
+
+	route {
+		respond /robots.txt `User-agent: *
+Disallow: /
+` 200
+		basic_auth {
+			{$CADDY_BASIC_AUTH_USER} {$CADDY_BASIC_AUTH_HASH}
+		}
+		reverse_proxy aiostreams:3000
+	}
 }
 
 {$AIOMETADATA_DOMAIN} {
 	{$CADDY_EXTERNAL_TLS}
-	reverse_proxy aiometadata:3232
+	header X-Robots-Tag "noindex, nofollow, noarchive"
+
+	route {
+		respond /robots.txt `User-agent: *
+Disallow: /
+` 200
+		basic_auth {
+			{$CADDY_BASIC_AUTH_USER} {$CADDY_BASIC_AUTH_HASH}
+		}
+		reverse_proxy aiometadata:3232
+	}
 }
