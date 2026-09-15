@@ -1,0 +1,18 @@
+{
+	default_sni {$INTERNAL_IP}
+}
+
+{$INTERNAL_IP} {
+	tls internal
+	reverse_proxy portainer:9000
+}
+
+{$AIOSTREAMS_DOMAIN} {
+	{$CADDY_EXTERNAL_TLS}
+	reverse_proxy aiostreams:3000
+}
+
+{$AIOMETADATA_DOMAIN} {
+	{$CADDY_EXTERNAL_TLS}
+	reverse_proxy aiometadata:3232
+}

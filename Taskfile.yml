@@ -1,0 +1,94 @@
+version: "3"
+
+tasks:
+  network:
+    desc: Create the apollo docker network if it doesn't exist
+    silent: true
+    cmds:
+      - docker network inspect apollo >/dev/null 2>&1 || docker network create apollo
+
+  up:portainer:
+    desc: Start Portainer
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f portainer/compose.yaml up -d
+
+  down:portainer:
+    desc: Stop Portainer
+    cmds:
+      - docker compose --env-file .env -f portainer/compose.yaml down
+
+  up:aiostreams:
+    desc: Start AIOStreams
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f aiostreams/compose.yaml up -d
+
+  down:aiostreams:
+    desc: Stop AIOStreams
+    cmds:
+      - docker compose --env-file .env -f aiostreams/compose.yaml down
+
+  up:redis:
+    desc: Start AIOMetadata's Redis
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f redis/compose.yaml up -d
+
+  down:redis:
+    desc: Stop AIOMetadata's Redis
+    cmds:
+      - docker compose --env-file .env -f redis/compose.yaml down
+
+  up:aiometadata:
+    desc: Start AIOMetadata
+    deps: [network, up:redis]
+    cmds:
+      - docker compose --env-file .env -f aiometadata/compose.yaml up -d
+
+  down:aiometadata:
+    desc: Stop AIOMetadata
+    cmds:
+      - docker compose --env-file .env -f aiometadata/compose.yaml down
+
+  up:caddy:
+    desc: Start Caddy
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f caddy/compose.yaml up -d
+
+  down:caddy:
+    desc: Stop Caddy
+    cmds:
+      - docker compose --env-file .env -f caddy/compose.yaml down
+
+  up:backup:
+    desc: Start backups (restic, dedicated container per job)
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f backup/compose.yaml up -d
+
+  down:backup:
+    desc: Stop backups
+    cmds:
+      - docker compose --env-file .env -f backup/compose.yaml down
+
+  up:
+    desc: Start all services
+    cmds:
+      - task: up:portainer
+      - task: up:redis
+      - task: up:aiometadata
+      - task: up:aiostreams
+      - task: up:caddy
+      - task: up:backup
+
+  down:
+    desc: Stop all services
+    cmds:
+      - task: down:backup
+      - task: down:caddy
+      - task: down:aiostreams
+      - task: down:aiometadata
+      - task: down:redis
+      - task: down:portainer

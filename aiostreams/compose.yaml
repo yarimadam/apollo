@@ -1,0 +1,26 @@
+services:
+  aiostreams:
+    image: ghcr.io/viren070/aiostreams:v2.34.0
+    container_name: aiostreams
+    restart: unless-stopped
+    environment:
+      BASE_URL: "${AIOSTREAMS_BASE_URL}"
+      SECRET_KEY: "${AIOSTREAMS_SECRET_KEY}"
+      DATABASE_URI: "sqlite://./data/db.sqlite"
+      AIOSTREAMS_AUTH: "${AIOSTREAMS_AUTH}"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - aiostreams_data:/app/data
+    networks:
+      - apollo
+
+volumes:
+  aiostreams_data:
+
+networks:
+  apollo:
+    external: true

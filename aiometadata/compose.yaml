@@ -1,0 +1,26 @@
+services:
+  aiometadata:
+    image: ghcr.io/cedya77/aiometadata:2.17.2
+    container_name: aiometadata
+    restart: unless-stopped
+    environment:
+      HOST_NAME: "${AIOMETADATA_HOST_NAME}"
+      DATABASE_URI: "sqlite://addon/data/db.sqlite"
+      REDIS_URL: "redis://:${REDIS_PASSWORD}@redis:6379"
+      ADMIN_KEY: "${AIOMETADATA_ADMIN_KEY}"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - aiometadata_data:/app/addon/data
+    networks:
+      - apollo
+
+volumes:
+  aiometadata_data:
+
+networks:
+  apollo:
+    external: true

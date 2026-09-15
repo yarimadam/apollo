@@ -1,0 +1,73 @@
+services:
+  backup:
+    image: mazzolino/restic:1.8.2
+    container_name: backup
+    restart: unless-stopped
+    environment:
+      RUN_ON_STARTUP: "true"
+      BACKUP_CRON: "0 30 3 * * *"
+      RESTIC_REPOSITORY: /mnt/restic
+      RESTIC_PASSWORD: "${RESTIC_PASSWORD}"
+      RESTIC_BACKUP_SOURCES: /mnt/volumes
+      RESTIC_BACKUP_ARGS: "--tag apollo"
+      RESTIC_FORGET_ARGS: "--keep-daily 7 --keep-weekly 4 --keep-monthly 6"
+      TZ: UTC
+    volumes:
+      - portainer_data:/mnt/volumes/portainer:ro
+      - caddy_data:/mnt/volumes/caddy:ro
+      - aiostreams_data:/mnt/volumes/aiostreams:ro
+      - aiometadata_data:/mnt/volumes/aiometadata:ro
+      - ./restic-repo:/mnt/restic
+    networks:
+      - apollo
+
+  prune:
+    image: mazzolino/restic:1.8.2
+    container_name: backup_prune
+    restart: unless-stopped
+    environment:
+      SKIP_INIT: "true"
+      RUN_ON_STARTUP: "false"
+      PRUNE_CRON: "0 0 4 * * 0"
+      RESTIC_REPOSITORY: /mnt/restic
+      RESTIC_PASSWORD: "${RESTIC_PASSWORD}"
+      TZ: UTC
+    volumes:
+      - ./restic-repo:/mnt/restic
+    networks:
+      - apollo
+
+  check:
+    image: mazzolino/restic:1.8.2
+    container_name: backup_check
+    restart: unless-stopped
+    environment:
+      SKIP_INIT: "true"
+      RUN_ON_STARTUP: "false"
+      CHECK_CRON: "0 15 5 * * 0"
+      RESTIC_CHECK_ARGS: "--read-data-subset=10%"
+      RESTIC_REPOSITORY: /mnt/restic
+      RESTIC_PASSWORD: "${RESTIC_PASSWORD}"
+      TZ: UTC
+    volumes:
+      - ./restic-repo:/mnt/restic
+    networks:
+      - apollo
+
+volumes:
+  portainer_data:
+    external: true
+    name: portainer_portainer_data
+  caddy_data:
+    external: true
+    name: caddy_caddy_data
+  aiostreams_data:
+    external: true
+    name: aiostreams_aiostreams_data
+  aiometadata_data:
+    external: true
+    name: aiometadata_aiometadata_data
+
+networks:
+  apollo:
+    external: true

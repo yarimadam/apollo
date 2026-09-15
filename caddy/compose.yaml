@@ -1,0 +1,35 @@
+services:
+  caddy:
+    image: caddy:2.11.4
+    container_name: caddy
+    restart: unless-stopped
+    environment:
+      INTERNAL_IP: "${INTERNAL_IP}"
+      AIOSTREAMS_DOMAIN: "${AIOSTREAMS_DOMAIN}"
+      AIOMETADATA_DOMAIN: "${AIOMETADATA_DOMAIN}"
+      CADDY_EXTERNAL_TLS: "${CADDY_EXTERNAL_TLS}"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT:-8443}:443"
+      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT:-8443}:443/udp"
+      - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT:-8444}:443"
+      - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT:-8444}:443/udp"
+      - "${EXTERNAL_IP}:${EXTERNAL_HTTP_PORT:-8080}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - apollo
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  apollo:
+    external: true

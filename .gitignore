@@ -1,0 +1,12 @@
+# Secrets — real values live only here, never commit. .env.example is the template.
+.env
+
+# Local restic backup repository — large, binary, and itself contains a copy
+# of every other service's data. Never belongs in git.
+backup/restic-repo/
+
+# JetBrains project/workspace state
+.idea/
+
+# macOS Finder metadata
+.DS_Store
