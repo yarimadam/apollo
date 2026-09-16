@@ -8,6 +8,7 @@ services:
       DATABASE_URI: "sqlite://addon/data/db.sqlite"
       REDIS_URL: "redis://:${REDIS_PASSWORD}@redis:6379"
       ADMIN_KEY: "${AIOMETADATA_ADMIN_KEY}"
+      ADDON_PASSWORD: "${AIOMETADATA_ADDON_PASSWORD}"
     logging:
       driver: json-file
       options:
