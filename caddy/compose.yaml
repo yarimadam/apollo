@@ -27,16 +27,14 @@ services:
       - ./robots.txt:/etc/caddy/static/robots.txt:ro
       # For Caddy's Tailscale cert manager (production only, unused locally).
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
-      - caddy_data:/data
-      - caddy_config:/config
+      - data:/data
+      - config:/config
     networks:
       - apollo
 
 volumes:
-  caddy_data:
-    name: caddy_data
-  caddy_config:
-    name: caddy_config
+  data:
+  config:
 
 networks:
   apollo:

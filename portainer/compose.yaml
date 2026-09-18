@@ -11,13 +11,12 @@ services:
         max-file: "3"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - data:/data
     networks:
       - apollo
 
 volumes:
-  portainer_data:
-    name: portainer_data
+  data:
 
 networks:
   apollo:

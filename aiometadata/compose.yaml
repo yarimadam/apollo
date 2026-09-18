@@ -15,13 +15,12 @@ services:
         max-size: "10m"
         max-file: "3"
     volumes:
-      - aiometadata_data:/app/addon/data
+      - data:/app/addon/data
     networks:
       - apollo
 
 volumes:
-  aiometadata_data:
-    name: aiometadata_data
+  data:
 
 networks:
   apollo:

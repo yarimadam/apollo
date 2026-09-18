@@ -15,13 +15,12 @@ services:
       timeout: 3s
       retries: 5
     volumes:
-      - redis_data:/data
+      - data:/data
     networks:
       - apollo
 
 volumes:
-  redis_data:
-    name: redis_data
+  data:
 
 networks:
   apollo:

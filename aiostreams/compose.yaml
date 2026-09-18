@@ -16,13 +16,12 @@ services:
         max-size: "10m"
         max-file: "3"
     volumes:
-      - aiostreams_data:/app/data
+      - data:/app/data
     networks:
       - apollo
 
 volumes:
-  aiostreams_data:
-    name: aiostreams_data
+  data:
 
 networks:
   apollo:
