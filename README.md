@@ -71,7 +71,7 @@ independently, or all together.
 
 ### Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) (OrbStack or Docker Desktop)
+- [Docker](https://docs.docker.com/get-docker/)
 - [Task](https://taskfile.dev/installation/)
 - [Tailscale](https://tailscale.com/), installed and running on the host:
   required, not optional. Portainer's routing and TLS both depend on it.

@@ -15,14 +15,8 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      # Portainer's internal listener runs on a container-side port (9000,
-      # matching Portainer's own upstream port for easy spotting) distinct
-      # from the external listener's (443). This is deliberate: Caddy
-      # multiplexes sites by SNI on whichever container port they're bound to,
-      # so if both host mappings forwarded to the same container port, a
-      # public client could reach the "internal-only" Portainer site just by
-      # sending its SNI/Host over the external socket. Separate container
-      # ports make that unreachable regardless of SNI.
+      # Container port 9000 (not 443) isolates Portainer from the external
+      # listener's SNI routing.
       - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:9000"
       - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:9000/udp"
       - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT}:443"
@@ -31,11 +25,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./robots.txt:/etc/caddy/static/robots.txt:ro
-      # Lets Caddy's built-in Tailscale cert manager reach tailscaled to fetch/
-      # renew the *.ts.net cert itself (production only — see PORTAINER_DOMAIN
-      # in .env.example). Harmless locally: CADDY_INTERNAL_TLS is "tls internal"
-      # there instead, so this socket is never dialed even if the mount is just
-      # an empty path.
+      # For Caddy's Tailscale cert manager (production only, unused locally).
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
       - caddy_data:/data
       - caddy_config:/config
