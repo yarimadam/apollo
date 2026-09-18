@@ -1,7 +1,3 @@
-{
-	default_sni {$INTERNAL_IP}
-}
-
 (noindex) {
 	header X-Robots-Tag "noindex, nofollow, noarchive"
 
@@ -11,8 +7,8 @@
 	}
 }
 
-{$INTERNAL_IP}:9000 {
-	tls internal
+{$PORTAINER_DOMAIN}:9000 {
+	{$CADDY_INTERNAL_TLS}
 	reverse_proxy portainer:9000
 }
 

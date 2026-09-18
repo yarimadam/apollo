@@ -4,9 +4,10 @@ services:
     container_name: caddy
     restart: unless-stopped
     environment:
-      INTERNAL_IP: "${INTERNAL_IP}"
+      PORTAINER_DOMAIN: "${PORTAINER_DOMAIN}"
       AIOSTREAMS_DOMAIN: "${AIOSTREAMS_DOMAIN}"
       AIOMETADATA_DOMAIN: "${AIOMETADATA_DOMAIN}"
+      CADDY_INTERNAL_TLS: "${CADDY_INTERNAL_TLS}"
       CADDY_EXTERNAL_TLS: "${CADDY_EXTERNAL_TLS}"
     logging:
       driver: json-file
@@ -30,6 +31,9 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./robots.txt:/etc/caddy/static/robots.txt:ro
+      # Only populated in production — see caddy/renew-tailscale-cert.sh.
+      # Empty/unused locally, where CADDY_INTERNAL_TLS is "tls internal" instead.
+      - ./tailscale-certs:/etc/caddy/tailscale:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
