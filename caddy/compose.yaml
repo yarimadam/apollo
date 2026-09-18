@@ -14,15 +14,16 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      # Portainer's internal listener runs on a container-side port (8443)
-      # distinct from the external listener's (443). This is deliberate: Caddy
+      # Portainer's internal listener runs on a container-side port (9000,
+      # matching Portainer's own upstream port for easy spotting) distinct
+      # from the external listener's (443). This is deliberate: Caddy
       # multiplexes sites by SNI on whichever container port they're bound to,
       # so if both host mappings forwarded to the same container port, a
       # public client could reach the "internal-only" Portainer site just by
       # sending its SNI/Host over the external socket. Separate container
       # ports make that unreachable regardless of SNI.
-      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:8443"
-      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:8443/udp"
+      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:9000"
+      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:9000/udp"
       - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT}:443"
       - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT}:443/udp"
       - "${EXTERNAL_IP}:${EXTERNAL_HTTP_PORT}:80"
