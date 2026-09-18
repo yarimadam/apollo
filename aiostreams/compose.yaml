@@ -7,6 +7,7 @@ services:
       BASE_URL: "${AIOSTREAMS_BASE_URL}"
       SECRET_KEY: "${AIOSTREAMS_SECRET_KEY}"
       DATABASE_URI: "sqlite://./data/db.sqlite"
+      REDIS_URI: "redis://:${REDIS_PASSWORD}@redis:6379"
       AIOSTREAMS_AUTH: "${AIOSTREAMS_AUTH}"
       AIOSTREAMS_AUTH_REQUIRED: "true"
     logging:
