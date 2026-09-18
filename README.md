@@ -30,7 +30,9 @@ There's no fallback for running this without a tailnet.
   Portainer is bound to a Tailscale-only listener and gets its cert from
   Caddy's built-in Tailscale cert manager
 - Portainer for container management, reachable only over the tailnet
-- Automated restic backup/prune/check jobs
+- Automated restic backup/prune/check jobs, covering `.env` alongside every
+  service's data volume; local by default, optionally offsite (e.g.
+  Cloudflare R2)
 - One `compose.yaml` per service, sharing a single external Docker network
 - Pinned image versions everywhere, no floating `latest` tags
 - `task up` / `task down` for the whole stack or a single service
@@ -111,6 +113,8 @@ the full, documented template). Key things you'll want to set:
   empty in production (real certs, issued automatically: Let's Encrypt for
   the external sites, Caddy's Tailscale cert manager for Portainer)
 - `RESTIC_PASSWORD`: encrypts your backup repository
+- `RESTIC_REPOSITORY`: optional restic backend URL for offsite backups (e.g.
+  Cloudflare R2); leave empty for local-only
 
 `.env` is git-ignored, never commit it. `.env.example` is the tracked,
 secret-free template.
