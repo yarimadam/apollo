@@ -21,6 +21,7 @@ services:
 
 volumes:
   redis_data:
+    name: redis_data
 
 networks:
   apollo:
