@@ -5,6 +5,11 @@
 # of every other service's data. Never belongs in git.
 backup/restic-repo/
 
+# Tailscale-issued cert/key for Portainer's internal site (production only).
+# See caddy/renew-tailscale-cert.sh.
+caddy/tailscale-certs/*
+!caddy/tailscale-certs/.gitkeep
+
 # JetBrains project/workspace state
 .idea/
 
