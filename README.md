@@ -119,6 +119,9 @@ the full, documented template). Key things you'll want to set:
 `.env` is git-ignored, never commit it. `.env.example` is the tracked,
 secret-free template.
 
+See [RECOVERY.md](RECOVERY.md) for restoring the stack onto a fresh server
+from backup.
+
 ## License
 
 [MIT](LICENSE)
