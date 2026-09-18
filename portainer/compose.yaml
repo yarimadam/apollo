@@ -4,6 +4,8 @@ services:
     container_name: portainer
     restart: unless-stopped
     command: -H unix:///var/run/docker.sock
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: json-file
       options:

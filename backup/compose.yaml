@@ -3,11 +3,13 @@ services:
     image: mazzolino/restic:1.8.2
     container_name: backup
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       RUN_ON_STARTUP: "true"
       BACKUP_CRON: "0 30 3 * * *"
       RESTIC_REPOSITORY: "${RESTIC_REPOSITORY:-/mnt/restic}"
-      RESTIC_PASSWORD: "${RESTIC_PASSWORD}"
+      RESTIC_PASSWORD: "${RESTIC_PASSWORD:?RESTIC_PASSWORD is required}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
       RESTIC_BACKUP_SOURCES: /mnt/volumes
@@ -28,12 +30,14 @@ services:
     image: mazzolino/restic:1.8.2
     container_name: backup_prune
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       SKIP_INIT: "true"
       RUN_ON_STARTUP: "false"
       PRUNE_CRON: "0 0 4 * * 0"
       RESTIC_REPOSITORY: "${RESTIC_REPOSITORY:-/mnt/restic}"
-      RESTIC_PASSWORD: "${RESTIC_PASSWORD}"
+      RESTIC_PASSWORD: "${RESTIC_PASSWORD:?RESTIC_PASSWORD is required}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
       TZ: UTC
@@ -46,13 +50,15 @@ services:
     image: mazzolino/restic:1.8.2
     container_name: backup_check
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       SKIP_INIT: "true"
       RUN_ON_STARTUP: "false"
       CHECK_CRON: "0 15 5 * * 0"
       RESTIC_CHECK_ARGS: "--read-data-subset=10%"
       RESTIC_REPOSITORY: "${RESTIC_REPOSITORY:-/mnt/restic}"
-      RESTIC_PASSWORD: "${RESTIC_PASSWORD}"
+      RESTIC_PASSWORD: "${RESTIC_PASSWORD:?RESTIC_PASSWORD is required}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
       TZ: UTC

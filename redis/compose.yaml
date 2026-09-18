@@ -3,7 +3,9 @@ services:
     image: redis:8.10.1
     container_name: redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --save 3600 1 --requirepass ${REDIS_PASSWORD}
+    command: redis-server --appendonly yes --save 3600 1 --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: json-file
       options:

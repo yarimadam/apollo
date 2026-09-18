@@ -3,10 +3,12 @@ services:
     image: ghcr.io/cedya77/aiometadata:2.17.2
     container_name: aiometadata
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       HOST_NAME: "${AIOMETADATA_HOST_NAME}"
       DATABASE_URI: "sqlite://addon/data/db.sqlite"
-      REDIS_URL: "redis://:${REDIS_PASSWORD}@redis:6379"
+      REDIS_URL: "redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required}@redis:6379"
       ADMIN_KEY: "${AIOMETADATA_ADMIN_KEY}"
       ADDON_PASSWORD: "${AIOMETADATA_ADDON_PASSWORD}"
     logging:
