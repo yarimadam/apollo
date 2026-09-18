@@ -2,6 +2,15 @@
 	default_sni {$INTERNAL_IP}
 }
 
+(noindex) {
+	header X-Robots-Tag "noindex, nofollow, noarchive"
+
+	handle /robots.txt {
+		root * /etc/caddy/static
+		file_server
+	}
+}
+
 {$INTERNAL_IP}:8443 {
 	tls internal
 	reverse_proxy portainer:9000
@@ -9,24 +18,18 @@
 
 {$AIOSTREAMS_DOMAIN} {
 	{$CADDY_EXTERNAL_TLS}
-	header X-Robots-Tag "noindex, nofollow, noarchive"
+	import noindex
 
-	route {
-		respond /robots.txt `User-agent: *
-Disallow: /
-` 200
+	handle {
 		reverse_proxy aiostreams:3000
 	}
 }
 
 {$AIOMETADATA_DOMAIN} {
 	{$CADDY_EXTERNAL_TLS}
-	header X-Robots-Tag "noindex, nofollow, noarchive"
+	import noindex
 
-	route {
-		respond /robots.txt `User-agent: *
-Disallow: /
-` 200
+	handle {
 		reverse_proxy aiometadata:3232
 	}
 }

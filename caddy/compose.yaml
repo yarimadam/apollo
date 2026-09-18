@@ -28,6 +28,7 @@ services:
       - "${EXTERNAL_IP}:${EXTERNAL_HTTP_PORT:-8080}:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./robots.txt:/etc/caddy/static/robots.txt:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
