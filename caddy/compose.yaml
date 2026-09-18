@@ -21,11 +21,11 @@ services:
       # public client could reach the "internal-only" Portainer site just by
       # sending its SNI/Host over the external socket. Separate container
       # ports make that unreachable regardless of SNI.
-      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT:-8443}:8443"
-      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT:-8443}:8443/udp"
-      - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT:-8444}:443"
-      - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT:-8444}:443/udp"
-      - "${EXTERNAL_IP}:${EXTERNAL_HTTP_PORT:-8080}:80"
+      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:8443"
+      - "${INTERNAL_IP}:${INTERNAL_HTTPS_PORT}:8443/udp"
+      - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT}:443"
+      - "${EXTERNAL_IP}:${EXTERNAL_HTTPS_PORT}:443/udp"
+      - "${EXTERNAL_IP}:${EXTERNAL_HTTP_PORT}:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./robots.txt:/etc/caddy/static/robots.txt:ro
