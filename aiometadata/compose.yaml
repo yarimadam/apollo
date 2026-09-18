@@ -21,6 +21,7 @@ services:
 
 volumes:
   aiometadata_data:
+    name: aiometadata_data
 
 networks:
   apollo:

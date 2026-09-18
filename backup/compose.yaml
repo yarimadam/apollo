@@ -64,16 +64,12 @@ services:
 volumes:
   portainer_data:
     external: true
-    name: portainer_portainer_data
   caddy_data:
     external: true
-    name: caddy_caddy_data
   aiostreams_data:
     external: true
-    name: aiostreams_aiostreams_data
   aiometadata_data:
     external: true
-    name: aiometadata_aiometadata_data
 
 networks:
   apollo:
