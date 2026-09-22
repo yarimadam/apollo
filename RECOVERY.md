@@ -29,12 +29,17 @@ on the same disk as everything else it backs up.
 
 2. Pre-create the named volumes, empty. Don't start the app containers yet;
    restoring after they've initialized can conflict with the old data
-   (`AIOSTREAMS_SECRET_KEY` in particular is tied to the restored configs):
+   (`AIOSTREAMS_SECRET_KEY` in particular is tied to the restored configs).
+   The labels mark them as Compose's own, as if `docker compose up` had
+   created them; without them, Compose warns on every start that the volume
+   "was not created by Docker Compose":
    ```sh
-   docker volume create portainer_data
-   docker volume create caddy_data
-   docker volume create aiostreams_data
-   docker volume create aiometadata_data
+   for s in portainer caddy aiostreams aiometadata; do
+     docker volume create \
+       --label com.docker.compose.project=$s \
+       --label com.docker.compose.volume=data \
+       ${s}_data
+   done
    ```
 
 3. Restore everything in one shot, using a throwaway container with the same
