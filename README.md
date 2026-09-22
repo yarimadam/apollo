@@ -17,19 +17,17 @@ automated [restic](https://restic.net/) backups, orchestrated end-to-end with
 [Task](https://taskfile.dev).
 
 This is an opinionated setup, not a general-purpose template: **Tailscale is
-mandatory**, not an optional extra. Portainer has no public exposure path; it's
-routed by its Tailscale MagicDNS name, and Caddy's built-in Tailscale cert
-manager (via the local `tailscaled` socket) is what issues its TLS cert.
-There's no fallback for running this without a tailnet.
+mandatory**, not an optional extra. Portainer has no public exposure path; it
+serves its own HTTPS (self-signed cert) on port 9443, bound only to the host's
+Tailscale IP. There's no fallback for running this without a tailnet.
 
 ## Features
 
 - AIOStreams: unified streaming addon for Stremio/Nuvio clients
 - AIOMetadata: metadata addon, Redis-backed
-- Split TLS/routing via Caddy: public sites get real Let's Encrypt certs;
-  Portainer is bound to a Tailscale-only listener and gets its cert from
-  Caddy's built-in Tailscale cert manager
-- Portainer for container management, reachable only over the tailnet
+- Caddy in front of the public sites, with real Let's Encrypt certs
+- Portainer for container management, reachable only over the tailnet at
+  `https://<tailscale-ip>:9443`
 - Automated restic backup/prune/check jobs, covering `.env` alongside every
   service's data volume; local by default, optionally offsite (e.g.
   Cloudflare R2)
@@ -43,7 +41,7 @@ There's no fallback for running this without a tailnet.
                          ┌──────────────┐
    Internet ─────────────▶    Caddy     │──────▶ AIOStreams (external)
                          │ (reverse     │──────▶ AIOMetadata (external)
-   Tailscale ────────────▶  proxy)      │──────▶ Portainer (internal only)
+                         │  proxy)      │
                          └──────────────┘
                                 │
                          apollo network
@@ -51,6 +49,8 @@ There's no fallback for running this without a tailnet.
                     ┌───────────────────────┐
                     │  Redis  │  Backups     │
                     └───────────────────────┘
+
+   Tailscale ────────────▶ Portainer :9443 (internal only)
 ```
 
 Every service lives in its own folder with its own `compose.yaml`, all
@@ -63,7 +63,7 @@ independently, or all together.
 | Service       | Folder         | Description                          | Exposure                    |
 |---------------|----------------|---------------------------------------|------------------------------|
 | `portainer`   | `portainer/`   | Docker management UI                  | Internal (Tailscale) only    |
-| `caddy`       | `caddy/`       | Reverse proxy, automatic HTTPS         | Internal + external          |
+| `caddy`       | `caddy/`       | Reverse proxy, automatic HTTPS         | External                     |
 | `aiostreams`  | `aiostreams/`  | Stremio/Nuvio streaming addon          | External                     |
 | `aiometadata` | `aiometadata/` | Stremio/Nuvio metadata addon           | External                     |
 | `redis`       | `redis/`       | Cache backing AIOMetadata              | Internal (apollo network)    |
@@ -76,7 +76,7 @@ independently, or all together.
 - [Docker](https://docs.docker.com/get-docker/)
 - [Task](https://taskfile.dev/installation/)
 - [Tailscale](https://tailscale.com/), installed and running on the host:
-  required, not optional. Portainer's routing and TLS both depend on it.
+  required, not optional. Portainer is only reachable over it.
 
 ### Installation
 
@@ -105,13 +105,11 @@ task --list                # see all available tasks
 All configuration lives in a single root `.env` file (see `.env.example` for
 the full, documented template). Key things you'll want to set:
 
-- `EXTERNAL_IP` / `INTERNAL_IP`: public vs. Tailscale-only interfaces
+- `PORTAINER_INTERFACE`: the host's Tailscale IP (`tailscale ip -4`);
+  Portainer binds here only
 - `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN`: public hostnames for each addon
-- `PORTAINER_DOMAIN`: Portainer's Tailscale MagicDNS name (e.g.
-  `apollo.your-tailnet.ts.net`)
-- `CADDY_EXTERNAL_TLS` / `CADDY_INTERNAL_TLS`: `tls internal` for local dev,
-  empty in production (real certs, issued automatically: Let's Encrypt for
-  the external sites, Caddy's Tailscale cert manager for Portainer)
+- `CADDY_TLS`: `tls internal` for local dev, empty in production
+  (real Let's Encrypt certs, issued automatically)
 - `RESTIC_PASSWORD`: encrypts your backup repository
 - `RESTIC_REPOSITORY`: optional restic backend URL for offsite backups (e.g.
   Cloudflare R2); leave empty for local-only

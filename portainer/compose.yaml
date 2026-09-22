@@ -11,15 +11,12 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    ports:
+      # Tailscale-only. Portainer's built-in HTTPS (self-signed cert).
+      - "${PORTAINER_INTERFACE:?}:9443:9443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
-    networks:
-      - apollo
 
 volumes:
   data:
-
-networks:
-  apollo:
-    external: true

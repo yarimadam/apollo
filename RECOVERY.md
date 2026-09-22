@@ -27,15 +27,7 @@ on the same disk as everything else it backs up.
    If restoring from a manually-copied local repo rather than offsite
    storage, also copy that directory to `apollo/backup/restic-repo/` now.
 
-2. If the new server's Tailscale hostname differs from the old one, fix it
-   before continuing, since `PORTAINER_DOMAIN` depends on it matching:
-   ```sh
-   tailscale up --hostname=apollo
-   ```
-   Remove or rename the old device in the Tailscale admin console first if
-   it's still registered.
-
-3. Pre-create the named volumes, empty. Don't start the app containers yet;
+2. Pre-create the named volumes, empty. Don't start the app containers yet;
    restoring after they've initialized can conflict with the old data
    (`AIOSTREAMS_SECRET_KEY` in particular is tied to the restored configs):
    ```sh
@@ -45,7 +37,7 @@ on the same disk as everything else it backs up.
    docker volume create aiometadata_data
    ```
 
-4. Restore everything in one shot, using a throwaway container with the same
+3. Restore everything in one shot, using a throwaway container with the same
    mount layout the backup job used, so `restic restore --target /` drops
    files back where they were read from.
 
@@ -82,35 +74,33 @@ on the same disk as everything else it backs up.
    Either way, this also drops the backed-up `.env` into
    `./restore-env/.env`.
 
-5. Move `.env` into place:
+4. Move `.env` into place:
    ```sh
    cp restore-env/.env .env && rm -rf restore-env
    ```
 
-6. Update the values in `.env` that are inherently tied to the old host:
-   - `EXTERNAL_IP`: the new server's public IP.
-   - `PORTAINER_DOMAIN`: only correct if the new server's Tailscale hostname
-     matches (step 2).
+5. Update the values in `.env` that are inherently tied to the old host:
+   - `PORTAINER_INTERFACE`: the new server's Tailscale IP (`tailscale ip -4`).
 
-7. Bring the stack up:
+6. Bring the stack up:
    ```sh
    task up
    ```
-   Caddy re-fetches certs as needed: Let's Encrypt for the external sites,
-   its built-in Tailscale cert manager for Portainer. Both usually work
-   immediately since `caddy_data` (holding prior cert state) was restored.
+   Caddy re-fetches Let's Encrypt certs for the external sites as needed,
+   usually immediately since `caddy_data` (holding prior cert state) was
+   restored.
 
-8. Re-apply what lives outside the repo, since none of it was backed up:
+7. Re-apply what lives outside the repo, since none of it was backed up:
    - Provider firewall rules (allow 443/tcp, 80/tcp, 443/udp, 41641/udp
      inbound, deny the rest).
-   - DNS: if `EXTERNAL_IP` changed, update `AIOSTREAMS_DOMAIN` /
+   - DNS: if the server's public IP changed, update `AIOSTREAMS_DOMAIN` /
      `AIOMETADATA_DOMAIN`'s A/AAAA records.
 
-9. Verify:
+8. Verify:
    ```sh
    docker compose ps
    tailscale status
    curl -I https://<AIOSTREAMS_DOMAIN>
    curl -I https://<AIOMETADATA_DOMAIN>
    ```
-   Confirm Portainer loads over the tailnet.
+   Confirm Portainer loads over the tailnet at `https://<tailscale-ip>:9443`.

@@ -7,13 +7,8 @@
 	}
 }
 
-{$PORTAINER_DOMAIN}:9000 {
-	{$CADDY_INTERNAL_TLS}
-	reverse_proxy portainer:9000
-}
-
 {$AIOSTREAMS_DOMAIN} {
-	{$CADDY_EXTERNAL_TLS}
+	{$CADDY_TLS}
 	import noindex
 
 	handle {
@@ -22,7 +17,7 @@
 }
 
 {$AIOMETADATA_DOMAIN} {
-	{$CADDY_EXTERNAL_TLS}
+	{$CADDY_TLS}
 	import noindex
 
 	handle {
