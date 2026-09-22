@@ -24,7 +24,7 @@ Tailscale IP. There's no fallback for running this without a tailnet.
 ## Features
 
 - AIOStreams: unified streaming addon for Stremio/Nuvio clients
-- AIOMetadata: metadata addon, Redis-backed
+- AIOMetadata: metadata addon
 - Caddy in front of the public sites, with real Let's Encrypt certs
 - Portainer for container management, reachable only over the tailnet at
   `https://<tailscale-ip>:9443`
@@ -66,7 +66,7 @@ independently, or all together.
 | `caddy`       | `caddy/`       | Reverse proxy, automatic HTTPS         | External                     |
 | `aiostreams`  | `aiostreams/`  | Stremio/Nuvio streaming addon          | External                     |
 | `aiometadata` | `aiometadata/` | Stremio/Nuvio metadata addon           | External                     |
-| `redis`       | `redis/`       | Cache backing AIOMetadata              | Internal (apollo network)    |
+| `redis`       | `redis/`       | Cache shared by AIOStreams/AIOMetadata | Internal (apollo network)    |
 | `backup`      | `backup/`      | restic backup / prune / check jobs     | n/a                           |
 
 ## Getting Started

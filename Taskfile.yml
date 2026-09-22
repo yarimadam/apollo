@@ -18,28 +18,6 @@ tasks:
     cmds:
       - docker compose --env-file .env -f portainer/compose.yaml down
 
-  up:aiostreams:
-    desc: Start AIOStreams
-    deps: [network]
-    cmds:
-      - docker compose --env-file .env -f aiostreams/compose.yaml up -d
-
-  down:aiostreams:
-    desc: Stop AIOStreams
-    cmds:
-      - docker compose --env-file .env -f aiostreams/compose.yaml down
-
-  up:redis:
-    desc: Start AIOMetadata's Redis
-    deps: [network]
-    cmds:
-      - docker compose --env-file .env -f redis/compose.yaml up -d
-
-  down:redis:
-    desc: Stop AIOMetadata's Redis
-    cmds:
-      - docker compose --env-file .env -f redis/compose.yaml down
-
   up:aiometadata:
     desc: Start AIOMetadata
     deps: [network, up:redis]
@@ -50,6 +28,29 @@ tasks:
     desc: Stop AIOMetadata
     cmds:
       - docker compose --env-file .env -f aiometadata/compose.yaml down
+
+  up:aiostreams:
+    desc: Start AIOStreams
+    deps: [network, up:redis]
+    cmds:
+      - docker compose --env-file .env -f aiostreams/compose.yaml up -d
+
+  down:aiostreams:
+    desc: Stop AIOStreams
+    cmds:
+      - docker compose --env-file .env -f aiostreams/compose.yaml down
+
+  up:redis:
+    desc: Start Redis
+    run: once
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f redis/compose.yaml up -d
+
+  down:redis:
+    desc: Stop Redis
+    cmds:
+      - docker compose --env-file .env -f redis/compose.yaml down
 
   up:caddy:
     desc: Start Caddy
