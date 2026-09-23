@@ -2,10 +2,13 @@ version: "3"
 
 tasks:
   network:
-    desc: Create the apollo docker network if it doesn't exist
+    desc: Create the apollo docker networks if they don't exist
     silent: true
     cmds:
       - docker network inspect apollo >/dev/null 2>&1 || docker network create apollo
+      # Dual-stack, Caddy only: published ports get kernel DNAT on IPv6 too,
+      # instead of docker-proxy, which hides the real client address.
+      - docker network inspect apollo_edge >/dev/null 2>&1 || docker network create --ipv6 apollo_edge
 
   up:portainer:
     desc: Start Portainer

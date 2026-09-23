@@ -31,11 +31,17 @@ services:
       - ./robots.txt:/etc/caddy/static/robots.txt:ro
       - data:/data
     networks:
-      - apollo
+      apollo: {}
+      # IPv6-enabled; carries the published ports and Caddy's default route.
+      # The apps stay IPv4-only on apollo, so their outbound traffic is unchanged.
+      apollo_edge:
+        gw_priority: 1
 
 volumes:
   data:
 
 networks:
   apollo:
+    external: true
+  apollo_edge:
     external: true

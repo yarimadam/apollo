@@ -31,7 +31,7 @@ Tailscale IP. There's no fallback for running this without a tailnet.
 - Automated restic backup/prune/check jobs, covering `.env` alongside every
   service's data volume; local by default, optionally offsite (e.g.
   Cloudflare R2)
-- One `compose.yaml` per service, sharing a single external Docker network
+- One `compose.yaml` per service, sharing an external Docker network
 - Pinned image versions everywhere, no floating `latest` tags
 - Hardened containers: all capabilities dropped (only what each image needs
   is added back), `no-new-privileges`, PID limits, read-only root filesystem
@@ -60,6 +60,12 @@ Every service lives in its own folder with its own `compose.yaml`, all
 attached to one external `apollo` Docker network and sharing a single root
 `.env` file. There's no monolithic compose file; spin services up and down
 independently, or all together.
+
+Caddy additionally joins `apollo_edge`, an IPv6-enabled network that carries
+its published ports. Docker then forwards IPv6 clients by kernel NAT instead
+of through `docker-proxy`, so Caddy (and the addons behind it) see real client
+addresses on IPv6 too. The addons stay IPv4-only, which keeps their outbound
+traffic to debrid/usenet services on a single address.
 
 ## Services
 
@@ -90,7 +96,7 @@ cp .env.example .env   # fill in your domains, IPs, and secrets
 task up
 ```
 
-Task creates the shared `apollo` network and brings every service up in the
+Task creates the shared networks and brings every service up in the
 right order.
 
 ### Usage
