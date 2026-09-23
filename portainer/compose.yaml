@@ -6,6 +6,9 @@ services:
     command: -H unix:///var/run/docker.sock
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 512
     logging:
       driver: json-file
       options:

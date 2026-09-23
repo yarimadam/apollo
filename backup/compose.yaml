@@ -9,6 +9,12 @@ services:
     # (container ID) changes on every recreate, orphaning old snapshots from
     # the retention policy.
     hostname: apollo
+    # Read-only access to volume files owned by other UIDs (e.g. .env).
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_READ_SEARCH
+    pids_limit: 256
     environment:
       RUN_ON_STARTUP: "true"
       BACKUP_CRON: "0 30 3 * * *"
@@ -37,6 +43,9 @@ services:
     security_opt:
       - no-new-privileges:true
     hostname: apollo
+    cap_drop:
+      - ALL
+    pids_limit: 256
     environment:
       SKIP_INIT: "true"
       RUN_ON_STARTUP: "false"
@@ -58,6 +67,9 @@ services:
     security_opt:
       - no-new-privileges:true
     hostname: apollo
+    cap_drop:
+      - ALL
+    pids_limit: 256
     environment:
       SKIP_INIT: "true"
       RUN_ON_STARTUP: "false"

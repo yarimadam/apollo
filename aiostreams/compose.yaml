@@ -5,6 +5,9 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 512
     environment:
       BASE_URL: "${AIOSTREAMS_BASE_URL}"
       SECRET_KEY: "${AIOSTREAMS_SECRET_KEY}"

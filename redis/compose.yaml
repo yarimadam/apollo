@@ -6,6 +6,16 @@ services:
     command: redis-server --appendonly yes --save 3600 1 --requirepass ${REDIS_PASSWORD:?}
     security_opt:
       - no-new-privileges:true
+    # The entrypoint chowns /data and drops to the redis user via setpriv.
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - SETPCAP
+    read_only: true
+    pids_limit: 256
     logging:
       driver: json-file
       options:

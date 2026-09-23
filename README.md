@@ -33,6 +33,9 @@ Tailscale IP. There's no fallback for running this without a tailnet.
   Cloudflare R2)
 - One `compose.yaml` per service, sharing a single external Docker network
 - Pinned image versions everywhere, no floating `latest` tags
+- Hardened containers: all capabilities dropped (only what each image needs
+  is added back), `no-new-privileges`, PID limits, read-only root filesystem
+  for Caddy and Redis
 - `task up` / `task down` for the whole stack or a single service
 
 ## Architecture
