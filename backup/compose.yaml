@@ -5,6 +5,10 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    # Stable hostname: restic groups snapshots by host, and the default
+    # (container ID) changes on every recreate, orphaning old snapshots from
+    # the retention policy.
+    hostname: apollo
     environment:
       RUN_ON_STARTUP: "true"
       BACKUP_CRON: "0 30 3 * * *"
@@ -14,7 +18,7 @@ services:
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
       RESTIC_BACKUP_SOURCES: /mnt/volumes
       RESTIC_BACKUP_ARGS: "--tag apollo"
-      RESTIC_FORGET_ARGS: "--keep-daily 7 --keep-weekly 4 --keep-monthly 6"
+      RESTIC_FORGET_ARGS: "--group-by tags --keep-daily 7 --keep-weekly 4 --keep-monthly 6"
       TZ: UTC
     volumes:
       - portainer_data:/mnt/volumes/portainer:ro
@@ -32,6 +36,7 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    hostname: apollo
     environment:
       SKIP_INIT: "true"
       RUN_ON_STARTUP: "false"
@@ -52,6 +57,7 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    hostname: apollo
     environment:
       SKIP_INIT: "true"
       RUN_ON_STARTUP: "false"
