@@ -1,0 +1,86 @@
+theme: auto
+
+server:
+  address: tcp://:9091/
+  endpoints:
+    authz:
+      forward-auth:
+        implementation: ForwardAuth
+        # Browser sessions only; no Authorization header logins.
+        authn_strategies:
+          - name: CookieSession
+
+log:
+  level: info
+
+telemetry:
+  metrics:
+    enabled: false
+
+totp:
+  issuer: '{{ env "DOMAIN" }}'
+
+webauthn:
+  disable: false
+  enable_passkey_login: true
+  display_name: Apollo
+
+# users.yml is mounted read-only; change passwords there.
+authentication_backend:
+  password_reset:
+    disable: true
+  password_change:
+    disable: true
+  file:
+    path: /etc/authelia/users.yml
+    watch: false
+
+regulation:
+  modes:
+    - user
+    - ip
+  max_retries: 3
+  find_time: 2m
+  ban_time: 12h
+
+session:
+  expiration: 1h
+  inactivity: 15m
+  remember_me: -1
+  cookies:
+    - domain: '{{ env "DOMAIN" }}'
+      authelia_url: 'https://{{ env "AUTH_DOMAIN" }}'
+  redis:
+    host: redis
+    port: 6379
+    # Index 0 is the addons' cache.
+    database_index: 1
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+# Addon clients (Stremio, Nuvio, SlickTrax) call manifest/catalog/meta/stream
+# and API paths without a browser, so only the browser-facing config and admin
+# pages go through a login.
+access_control:
+  default_policy: deny
+  rules:
+    - domain:
+        - '{{ env "AIOSTREAMS_DOMAIN" }}'
+        - '{{ env "AIOMETADATA_DOMAIN" }}'
+        - '{{ env "SLICKSYNC_DOMAIN" }}'
+      resources:
+        - '^/([?].*)?$'
+        - '/configure([/?].*)?$'
+        - '/(dashboard|admin)([/?].*)?$'
+      policy: two_factor
+    - domain:
+        - '{{ env "AIOSTREAMS_DOMAIN" }}'
+        - '{{ env "AIOMETADATA_DOMAIN" }}'
+        - '{{ env "SLICKSYNC_DOMAIN" }}'
+      policy: bypass

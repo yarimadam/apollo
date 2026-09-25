@@ -1,6 +1,9 @@
 # Secrets — real values live only here, never commit. .env.example is the template.
 .env
 
+# Authelia's users and password hashes. users.yml.example is the template.
+authelia/users.yml
+
 # Local restic backup repository — large, binary, and itself contains a copy
 # of every other service's data. Never belongs in git.
 backup/restic-repo/

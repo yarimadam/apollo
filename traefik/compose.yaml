@@ -17,6 +17,7 @@ services:
       AIOSTREAMS_DOMAIN: "${AIOSTREAMS_DOMAIN:?}"
       AIOMETADATA_DOMAIN: "${AIOMETADATA_DOMAIN:?}"
       SLICKSYNC_DOMAIN: "${SLICKSYNC_DOMAIN:?}"
+      AUTH_DOMAIN: "${AUTH_DOMAIN:?}"
     logging:
       driver: json-file
       options:

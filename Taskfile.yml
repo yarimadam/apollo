@@ -66,6 +66,17 @@ tasks:
     cmds:
       - docker compose --env-file redis/.env -f redis/compose.yaml down
 
+  up:authelia:
+    desc: Start Authelia
+    deps: [network, up:redis]
+    cmds:
+      - docker compose --env-file authelia/.env -f authelia/compose.yaml up -d
+
+  down:authelia:
+    desc: Stop Authelia
+    cmds:
+      - docker compose --env-file authelia/.env -f authelia/compose.yaml down
+
   up:traefik:
     desc: Start Traefik
     deps: [network]
@@ -96,6 +107,7 @@ tasks:
       - task: up:aiometadata
       - task: up:aiostreams
       - task: up:slicksync
+      - task: up:authelia
       - task: up:traefik
       - task: up:backup
 
@@ -104,6 +116,7 @@ tasks:
     cmds:
       - task: down:backup
       - task: down:traefik
+      - task: down:authelia
       - task: down:slicksync
       - task: down:aiostreams
       - task: down:aiometadata

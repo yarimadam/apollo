@@ -25,6 +25,14 @@ http:
       tls:
         certResolver: '{{ $certResolver }}'
 
+    authelia:
+      rule: 'Host(`{{ env "AUTH_DOMAIN" }}`)'
+      entryPoints: [websecure]
+      middlewares: [security, noframe]
+      service: authelia
+      tls:
+        certResolver: '{{ $certResolver }}'
+
     # Only on the admin entrypoint, which is published on the Tailscale IP.
     dashboard:
       rule: 'PathPrefix(`/api`) || PathPrefix(`/dashboard`)'
@@ -42,6 +50,10 @@ http:
           Server: ""
           X-Robots-Tag: "noindex, nofollow, noarchive"
 
+    noframe:
+      headers:
+        frameDeny: true
+
   services:
     aiostreams:
       loadBalancer:
@@ -55,6 +67,10 @@ http:
       loadBalancer:
         servers:
           - url: http://slicksync:3000
+    authelia:
+      loadBalancer:
+        servers:
+          - url: http://authelia:9091
 
 tls:
   options:

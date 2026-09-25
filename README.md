@@ -5,6 +5,7 @@
 
 ![Docker Compose](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)
 ![Traefik](https://img.shields.io/badge/reverse%20proxy-traefik-24A1C1?logo=traefikproxy&logoColor=white)
+![Authelia](https://img.shields.io/badge/auth-authelia-113155?logo=authelia&logoColor=white)
 ![Self Hosted](https://img.shields.io/badge/self--hosted-yes-success)
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 
@@ -12,7 +13,8 @@ Apollo bundles a [Stremio](https://www.stremio.com/)/[Nuvio](https://github.com/
 streaming addon ([AIOStreams](https://github.com/Viren070/AIOStreams)) and a
 metadata addon ([AIOMetadata](https://github.com/cedya77/aiometadata)) and an
 account/addon manager ([SlickSync](https://github.com/slicknsliding/slicksync)) behind
-[Traefik](https://traefik.io/traefik/), with [Portainer](https://www.portainer.io/)
+[Traefik](https://traefik.io/traefik/) and [Authelia](https://www.authelia.com/),
+with [Portainer](https://www.portainer.io/)
 for container management, [Redis](https://redis.io/) for caching, and
 automated [restic](https://restic.net/) backups, orchestrated end-to-end with
 [Task](https://taskfile.dev).
@@ -42,7 +44,7 @@ fallback for running this without a tailnet.
 - Pinned image versions everywhere, no floating `latest` tags
 - Hardened containers: all capabilities dropped (only what each image needs
   is added back), `no-new-privileges`, PID limits, read-only root filesystem
-  for Traefik and Redis
+  for Traefik and Redis; Authelia runs as a non-root user
 - `task up` / `task down` for the whole stack or a single service
 
 ## Architecture
@@ -52,7 +54,7 @@ fallback for running this without a tailnet.
    Internet ─────────────▶   Traefik    │──────▶ AIOStreams (external)
                          │ (reverse     │──────▶ AIOMetadata (external)
                          │  proxy)      │──────▶ SlickSync (external)
-                         └──────────────┘
+                         └──────────────┘──────▶ Authelia (login portal)
                                 │
                          apollo network
                                 │
@@ -81,10 +83,11 @@ traffic to debrid/usenet services on a single address.
 |---------------|----------------|---------------------------------------|------------------------------|
 | `portainer`   | `portainer/`   | Docker management UI                  | Internal (Tailscale) only    |
 | `traefik`     | `traefik/`     | Reverse proxy, automatic HTTPS         | External (dashboard: Tailscale only) |
+| `authelia`    | `authelia/`    | Two-factor login for the addons        | External, via Traefik only   |
 | `aiostreams`  | `aiostreams/`  | Stremio/Nuvio streaming addon          | External                     |
 | `aiometadata` | `aiometadata/` | Stremio/Nuvio metadata addon           | External                     |
 | `slicksync`   | `slicksync/`   | Stremio/Nuvio account/addon manager    | External                     |
-| `redis`       | `redis/`       | Cache shared by AIOStreams/AIOMetadata | Internal (apollo network)    |
+| `redis`       | `redis/`       | Addon cache, Authelia sessions         | Internal (apollo network)    |
 | `backup`      | `backup/`      | restic backup / prune / check jobs     | n/a                           |
 
 ## Getting Started
@@ -102,7 +105,9 @@ traffic to debrid/usenet services on a single address.
 git clone <this-repo>
 cd apollo
 for d in */; do [ -f "$d.env.example" ] && cp "$d.env.example" "$d.env"; done
-# fill in each */.env with your domains, IPs, and secrets
+cp authelia/users.yml.example authelia/users.yml
+# fill in each */.env with your domains, IPs, and secrets, and
+# authelia/users.yml with your user and password hash
 task up
 ```
 
@@ -130,9 +135,15 @@ on its own. Key things you'll want to set:
 - `traefik/.env` `INTERFACE`: the host's Tailscale IP; the dashboard
   binds here only
 - `traefik/.env` `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN` /
-  `SLICKSYNC_DOMAIN`: public hostnames for each service
+  `SLICKSYNC_DOMAIN` / `AUTH_DOMAIN`: public hostnames for each service and
+  the login portal, all under one parent domain
 - `traefik/.env` `CERT_RESOLVER`: `letsencrypt` in production (real certs,
   issued automatically), empty for Traefik's self-signed cert in local dev
+- `authelia/.env` `DOMAIN`: that parent domain; the login cookie covers it
+- `authelia/users.yml`: your users. Hash passwords via
+  `docker run --rm -it authelia/authelia:<tag> authelia crypto hash generate argon2`.
+  Password reset and change are off, so edit this file and restart
+  Authelia instead
 - `backup/.env` `RESTIC_PASSWORD`: encrypts your backup repository
 - `backup/.env` `RESTIC_REPOSITORY`: optional restic backend URL for offsite
   backups (e.g. Cloudflare R2); leave empty for local-only
@@ -140,15 +151,26 @@ on its own. Key things you'll want to set:
 A few values describe a connection between two services, so they must be
 set to the same value in both files:
 
-- Redis password: `redis/.env` `PASSWORD`, and `REDIS_PASSWORD` in
-  `aiostreams/.env` and `aiometadata/.env`
+- Redis password: `redis/.env` `PASSWORD`, `REDIS_PASSWORD` in
+  `aiostreams/.env` and `aiometadata/.env`, and `authelia/.env`
+  `AUTHELIA_SESSION_REDIS_PASSWORD`
 - SlickSync's AIOStreams login: one `user:pass` entry of `aiostreams/.env`
   `AIOSTREAMS_AUTH`, and `slicksync/.env` `AIOSTREAMS_AUTH_USERNAME` /
   `AIOSTREAMS_AUTH_PASSWORD`
-- Public URLs: `traefik/.env` domains and each app's own base URL
+- Public URLs: `traefik/.env` domains, `authelia/.env` domains, and each
+  app's own base URL
 
-`.env` files are git-ignored, never commit them. The `.env.example` files
-are the tracked, secret-free templates.
+`.env` files and `authelia/users.yml` are git-ignored, never commit them.
+The `.example` files are the tracked, secret-free templates.
+
+### First login
+
+On your first two-factor setup, Authelia asks for a one-time code it "sent"
+you. There's no email; it's written to a file in its volume:
+
+```sh
+docker exec -u 65532 authelia cat /config/notification.txt
+```
 
 ### Search engines
 
@@ -168,4 +190,5 @@ from backup.
 - [AIOMetadata](https://github.com/cedya77/aiometadata)
 - [SlickSync](https://github.com/slicknsliding/slicksync)
 - [Traefik](https://github.com/traefik/traefik)
+- [Authelia](https://github.com/authelia/authelia)
 - [Portainer](https://github.com/portainer/portainer)
