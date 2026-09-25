@@ -29,11 +29,14 @@ services:
     volumes:
       - portainer_data:/mnt/volumes/portainer:ro
       - traefik_data:/mnt/volumes/traefik:ro
+      - authelia_data:/mnt/volumes/authelia:ro
       - aiostreams_data:/mnt/volumes/aiostreams:ro
       - aiometadata_data:/mnt/volumes/aiometadata:ro
       - slicksync_data:/mnt/volumes/slicksync:ro
       - ../portainer/.env:/mnt/volumes/env/portainer/.env:ro
       - ../traefik/.env:/mnt/volumes/env/traefik/.env:ro
+      - ../authelia/.env:/mnt/volumes/env/authelia/.env:ro
+      - ../authelia/users.yml:/mnt/volumes/env/authelia/users.yml:ro
       - ../redis/.env:/mnt/volumes/env/redis/.env:ro
       - ../aiostreams/.env:/mnt/volumes/env/aiostreams/.env:ro
       - ../aiometadata/.env:/mnt/volumes/env/aiometadata/.env:ro
@@ -96,6 +99,8 @@ volumes:
   portainer_data:
     external: true
   traefik_data:
+    external: true
+  authelia_data:
     external: true
   aiostreams_data:
     external: true
