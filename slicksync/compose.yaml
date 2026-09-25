@@ -1,0 +1,35 @@
+services:
+  slicksync:
+    # Upstream only publishes a floating `private` tag, so pin its digest.
+    image: ghcr.io/slicknsliding/slicksync:private@sha256:fc69f2927ea19533f237aa2e6e6336ecd0016fda92c76e7dc8b78c178c35fc71
+    container_name: slicksync
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 512
+    environment:
+      JWT_SECRET: "${SLICKSYNC_JWT_SECRET:?}"
+      # Without these the private instance has no login at all.
+      SLICKSYNC_PRIVATE_USERNAME: "${SLICKSYNC_USERNAME:?}"
+      SLICKSYNC_PRIVATE_PASSWORD: "${SLICKSYNC_PASSWORD:?}"
+      PUBLIC_APP_URL: "${SLICKSYNC_PUBLIC_APP_URL}"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # SQLite database and the self-generated ENCRYPTION_KEY that stored
+    # provider credentials are encrypted against.
+    volumes:
+      - data:/app/data
+    networks:
+      - apollo
+
+volumes:
+  data:
+
+networks:
+  apollo:
+    external: true

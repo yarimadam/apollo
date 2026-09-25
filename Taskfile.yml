@@ -43,6 +43,17 @@ tasks:
     cmds:
       - docker compose --env-file .env -f aiostreams/compose.yaml down
 
+  up:slicksync:
+    desc: Start SlickSync
+    deps: [network]
+    cmds:
+      - docker compose --env-file .env -f slicksync/compose.yaml up -d
+
+  down:slicksync:
+    desc: Stop SlickSync
+    cmds:
+      - docker compose --env-file .env -f slicksync/compose.yaml down
+
   up:redis:
     desc: Start Redis
     run: once
@@ -84,6 +95,7 @@ tasks:
       - task: up:redis
       - task: up:aiometadata
       - task: up:aiostreams
+      - task: up:slicksync
       - task: up:caddy
       - task: up:backup
 
@@ -92,6 +104,7 @@ tasks:
     cmds:
       - task: down:backup
       - task: down:caddy
+      - task: down:slicksync
       - task: down:aiostreams
       - task: down:aiometadata
       - task: down:redis

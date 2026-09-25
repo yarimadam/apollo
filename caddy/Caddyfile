@@ -35,3 +35,13 @@
 		reverse_proxy aiometadata:3232
 	}
 }
+
+{$SLICKSYNC_DOMAIN} {
+	{$CADDY_TLS}
+	import security
+	import noindex
+
+	handle {
+		reverse_proxy slicksync:3000
+	}
+}

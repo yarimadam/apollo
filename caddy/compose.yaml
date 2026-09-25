@@ -16,6 +16,7 @@ services:
     environment:
       AIOSTREAMS_DOMAIN: "${AIOSTREAMS_DOMAIN:?}"
       AIOMETADATA_DOMAIN: "${AIOMETADATA_DOMAIN:?}"
+      SLICKSYNC_DOMAIN: "${SLICKSYNC_DOMAIN:?}"
       CADDY_TLS: "${CADDY_TLS}"
     logging:
       driver: json-file

@@ -34,7 +34,7 @@ on the same disk as everything else it backs up.
    created them; without them, Compose warns on every start that the volume
    "was not created by Docker Compose":
    ```sh
-   for s in portainer caddy aiostreams aiometadata; do
+   for s in portainer caddy aiostreams aiometadata slicksync; do
      docker volume create \
        --label com.docker.compose.project=$s \
        --label com.docker.compose.volume=data \
@@ -57,6 +57,7 @@ on the same disk as everything else it backs up.
      -v caddy_data:/mnt/volumes/caddy \
      -v aiostreams_data:/mnt/volumes/aiostreams \
      -v aiometadata_data:/mnt/volumes/aiometadata \
+     -v slicksync_data:/mnt/volumes/slicksync \
      -v "$(pwd)/restore-env:/mnt/volumes/env" \
      mazzolino/restic:1.8.2 restic restore latest --target /
    ```
@@ -72,6 +73,7 @@ on the same disk as everything else it backs up.
      -v caddy_data:/mnt/volumes/caddy \
      -v aiostreams_data:/mnt/volumes/aiostreams \
      -v aiometadata_data:/mnt/volumes/aiometadata \
+     -v slicksync_data:/mnt/volumes/slicksync \
      -v "$(pwd)/restore-env:/mnt/volumes/env" \
      mazzolino/restic:1.8.2 restic restore latest --target /
    ```
@@ -99,7 +101,7 @@ on the same disk as everything else it backs up.
    - Provider firewall rules (allow 443/tcp, 80/tcp, 443/udp, 41641/udp
      inbound, deny the rest).
    - DNS: if the server's public IP changed, update `AIOSTREAMS_DOMAIN` /
-     `AIOMETADATA_DOMAIN`'s A/AAAA records.
+     `AIOMETADATA_DOMAIN` / `SLICKSYNC_DOMAIN`'s A/AAAA records.
 
 8. Verify:
    ```sh
@@ -107,5 +109,6 @@ on the same disk as everything else it backs up.
    tailscale status
    curl -I https://<AIOSTREAMS_DOMAIN>
    curl -I https://<AIOMETADATA_DOMAIN>
+   curl -I https://<SLICKSYNC_DOMAIN>
    ```
    Confirm Portainer loads over the tailnet at `https://<tailscale-ip>:9443`.

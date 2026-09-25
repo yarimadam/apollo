@@ -31,6 +31,7 @@ services:
       - caddy_data:/mnt/volumes/caddy:ro
       - aiostreams_data:/mnt/volumes/aiostreams:ro
       - aiometadata_data:/mnt/volumes/aiometadata:ro
+      - slicksync_data:/mnt/volumes/slicksync:ro
       - ../.env:/mnt/volumes/env/.env:ro
       - ./restic-repo:/mnt/restic
     networks:
@@ -93,6 +94,8 @@ volumes:
   aiostreams_data:
     external: true
   aiometadata_data:
+    external: true
+  slicksync_data:
     external: true
 
 networks:

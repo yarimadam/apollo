@@ -10,7 +10,8 @@
 
 Apollo bundles a [Stremio](https://www.stremio.com/)/[Nuvio](https://github.com/NuvioMedia)
 streaming addon ([AIOStreams](https://github.com/Viren070/AIOStreams)) and a
-metadata addon ([AIOMetadata](https://github.com/cedya77/aiometadata)) behind
+metadata addon ([AIOMetadata](https://github.com/cedya77/aiometadata)) and an
+account/addon manager ([SlickSync](https://github.com/slicknsliding/slicksync)) behind
 [Caddy](https://caddyserver.com/), with [Portainer](https://www.portainer.io/)
 for container management, [Redis](https://redis.io/) for caching, and
 automated [restic](https://restic.net/) backups, orchestrated end-to-end with
@@ -25,6 +26,8 @@ Tailscale IP. There's no fallback for running this without a tailnet.
 
 - AIOStreams: unified streaming addon for Stremio/Nuvio clients
 - AIOMetadata: metadata addon
+- SlickSync: addon, user and credential management across Stremio/Nuvio
+  accounts
 - Caddy in front of the public sites, with real Let's Encrypt certs
 - Portainer for container management, reachable only over the tailnet at
   `https://<tailscale-ip>:9443`
@@ -44,7 +47,7 @@ Tailscale IP. There's no fallback for running this without a tailnet.
                          ┌──────────────┐
    Internet ─────────────▶    Caddy     │──────▶ AIOStreams (external)
                          │ (reverse     │──────▶ AIOMetadata (external)
-                         │  proxy)      │
+                         │  proxy)      │──────▶ SlickSync (external)
                          └──────────────┘
                                 │
                          apollo network
@@ -75,6 +78,7 @@ traffic to debrid/usenet services on a single address.
 | `caddy`       | `caddy/`       | Reverse proxy, automatic HTTPS         | External                     |
 | `aiostreams`  | `aiostreams/`  | Stremio/Nuvio streaming addon          | External                     |
 | `aiometadata` | `aiometadata/` | Stremio/Nuvio metadata addon           | External                     |
+| `slicksync`   | `slicksync/`   | Stremio/Nuvio account/addon manager    | External                     |
 | `redis`       | `redis/`       | Cache shared by AIOStreams/AIOMetadata | Internal (apollo network)    |
 | `backup`      | `backup/`      | restic backup / prune / check jobs     | n/a                           |
 
@@ -116,7 +120,8 @@ the full, documented template). Key things you'll want to set:
 
 - `PORTAINER_INTERFACE`: the host's Tailscale IP (`tailscale ip -4`);
   Portainer binds here only
-- `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN`: public hostnames for each addon
+- `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN` / `SLICKSYNC_DOMAIN`: public
+  hostnames for each service
 - `CADDY_TLS`: `tls internal` for local dev, empty in production
   (real Let's Encrypt certs, issued automatically)
 - `RESTIC_PASSWORD`: encrypts your backup repository
@@ -137,5 +142,6 @@ from backup.
 
 - [AIOStreams](https://github.com/Viren070/AIOStreams)
 - [AIOMetadata](https://github.com/cedya77/aiometadata)
+- [SlickSync](https://github.com/slicknsliding/slicksync)
 - [Caddy](https://github.com/caddyserver/caddy)
 - [Portainer](https://github.com/portainer/portainer)
