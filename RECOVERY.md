@@ -29,7 +29,8 @@ on the same disk as everything else it backs up.
 
 2. Pre-create the named volumes, empty. Don't start the app containers yet;
    restoring after they've initialized can conflict with the old data
-   (`AIOSTREAMS_SECRET_KEY` in particular is tied to the restored configs).
+   (`aiostreams/.env` `SECRET_KEY` in particular is tied to the restored
+   configs).
    The labels mark them as Compose's own, as if `docker compose up` had
    created them; without them, Compose warns on every start that the volume
    "was not created by Docker Compose":
@@ -87,9 +88,9 @@ on the same disk as everything else it backs up.
    ```
 
 5. Update the values that are inherently tied to the old host:
-   - `portainer/.env` `PORTAINER_INTERFACE`: the new server's Tailscale IP
+   - `portainer/.env` `INTERFACE`: the new server's Tailscale IP
      (`tailscale ip -4`).
-   - `slicksync/.env` `SLICKSYNC_AIOSTREAMS_IGNORE_IPS`: the new server's
+   - `slicksync/.env` `AIOSTREAMS_IGNORE_IPS`: the new server's
      public IP(s), if set.
 
 6. Bring the stack up:

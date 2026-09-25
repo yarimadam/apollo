@@ -17,16 +17,16 @@ services:
       AIOSTREAMS_DOMAIN: "${AIOSTREAMS_DOMAIN:?}"
       AIOMETADATA_DOMAIN: "${AIOMETADATA_DOMAIN:?}"
       SLICKSYNC_DOMAIN: "${SLICKSYNC_DOMAIN:?}"
-      CADDY_TLS: "${CADDY_TLS}"
+      TLS: "${TLS}"
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
     ports:
-      - "${CADDY_HTTPS_PORT:?}:443"
-      - "${CADDY_HTTPS_PORT:?}:443/udp"
-      - "${CADDY_HTTP_PORT:?}:80"
+      - "${HTTPS_PORT:?}:443"
+      - "${HTTPS_PORT:?}:443/udp"
+      - "${HTTP_PORT:?}:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./robots.txt:/etc/caddy/static/robots.txt:ro

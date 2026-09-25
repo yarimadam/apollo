@@ -3,7 +3,7 @@ services:
     image: redis:8.10.1
     container_name: redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --save 3600 1 --requirepass ${REDIS_PASSWORD:?}
+    command: redis-server --appendonly yes --save 3600 1 --requirepass ${PASSWORD:?}
     security_opt:
       - no-new-privileges:true
     # The entrypoint chowns /data and drops to the redis user via setpriv.
@@ -22,7 +22,7 @@ services:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "--no-auth-warning", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${PASSWORD}", "--no-auth-warning", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5

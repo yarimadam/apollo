@@ -9,11 +9,11 @@ services:
       - ALL
     pids_limit: 512
     environment:
-      HOST_NAME: "${AIOMETADATA_HOST_NAME}"
+      HOST_NAME: "${HOST_NAME}"
       DATABASE_URI: "sqlite://addon/data/db.sqlite"
       REDIS_URL: "redis://:${REDIS_PASSWORD:?}@redis:6379"
-      ADMIN_KEY: "${AIOMETADATA_ADMIN_KEY}"
-      ADDON_PASSWORD: "${AIOMETADATA_ADDON_PASSWORD}"
+      ADMIN_KEY: "${ADMIN_KEY}"
+      ADDON_PASSWORD: "${ADDON_PASSWORD}"
     logging:
       driver: json-file
       options:

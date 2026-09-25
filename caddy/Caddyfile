@@ -17,7 +17,7 @@
 }
 
 {$AIOSTREAMS_DOMAIN} {
-	{$CADDY_TLS}
+	{$TLS}
 	import security
 	import noindex
 
@@ -27,7 +27,7 @@
 }
 
 {$AIOMETADATA_DOMAIN} {
-	{$CADDY_TLS}
+	{$TLS}
 	import security
 	import noindex
 
@@ -37,7 +37,7 @@
 }
 
 {$SLICKSYNC_DOMAIN} {
-	{$CADDY_TLS}
+	{$TLS}
 	import security
 	import noindex
 

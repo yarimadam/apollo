@@ -10,18 +10,18 @@ services:
       - ALL
     pids_limit: 512
     environment:
-      JWT_SECRET: "${SLICKSYNC_JWT_SECRET:?}"
+      JWT_SECRET: "${JWT_SECRET:?}"
       # Without these the private instance has no login at all.
-      SLICKSYNC_PRIVATE_USERNAME: "${SLICKSYNC_USERNAME:?}"
-      SLICKSYNC_PRIVATE_PASSWORD: "${SLICKSYNC_PASSWORD:?}"
-      PUBLIC_APP_URL: "${SLICKSYNC_PUBLIC_APP_URL}"
+      SLICKSYNC_PRIVATE_USERNAME: "${SLICKSYNC_PRIVATE_USERNAME:?}"
+      SLICKSYNC_PRIVATE_PASSWORD: "${SLICKSYNC_PRIVATE_PASSWORD:?}"
+      PUBLIC_APP_URL: "${PUBLIC_APP_URL}"
       # Now Playing via AIOStreams' live-streams dashboard. That endpoint is
       # admin-only, so this is a dedicated AIOStreams admin login, listed in
       # aiostreams/.env AIOSTREAMS_AUTH.
       AIOSTREAMS_URL: "http://aiostreams:3000"
-      AIOSTREAMS_AUTH_USERNAME: "${SLICKSYNC_AIOSTREAMS_USERNAME:?}"
-      AIOSTREAMS_AUTH_PASSWORD: "${SLICKSYNC_AIOSTREAMS_PASSWORD:?}"
-      AIOSTREAMS_IGNORE_IPS: "${SLICKSYNC_AIOSTREAMS_IGNORE_IPS}"
+      AIOSTREAMS_AUTH_USERNAME: "${AIOSTREAMS_AUTH_USERNAME:?}"
+      AIOSTREAMS_AUTH_PASSWORD: "${AIOSTREAMS_AUTH_PASSWORD:?}"
+      AIOSTREAMS_IGNORE_IPS: "${AIOSTREAMS_IGNORE_IPS}"
     logging:
       driver: json-file
       options:

@@ -120,11 +120,11 @@ Each service reads only its own `<service>/.env` (see the `.env.example`
 next to it for the full, documented template), so every `compose.yaml` runs
 on its own. Key things you'll want to set:
 
-- `portainer/.env` `PORTAINER_INTERFACE`: the host's Tailscale IP
+- `portainer/.env` `INTERFACE`: the host's Tailscale IP
   (`tailscale ip -4`); Portainer binds here only
 - `caddy/.env` `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN` /
   `SLICKSYNC_DOMAIN`: public hostnames for each service
-- `caddy/.env` `CADDY_TLS`: `tls internal` for local dev, empty in production
+- `caddy/.env` `TLS`: `tls internal` for local dev, empty in production
   (real Let's Encrypt certs, issued automatically)
 - `backup/.env` `RESTIC_PASSWORD`: encrypts your backup repository
 - `backup/.env` `RESTIC_REPOSITORY`: optional restic backend URL for offsite
@@ -133,10 +133,11 @@ on its own. Key things you'll want to set:
 A few values describe a connection between two services, so they must be
 set to the same value in both files:
 
-- `REDIS_PASSWORD`: in `redis/.env`, `aiostreams/.env` and `aiometadata/.env`
+- Redis password: `redis/.env` `PASSWORD`, and `REDIS_PASSWORD` in
+  `aiostreams/.env` and `aiometadata/.env`
 - SlickSync's AIOStreams login: one `user:pass` entry of `aiostreams/.env`
-  `AIOSTREAMS_AUTH`, and `slicksync/.env` `SLICKSYNC_AIOSTREAMS_USERNAME` /
-  `SLICKSYNC_AIOSTREAMS_PASSWORD`
+  `AIOSTREAMS_AUTH`, and `slicksync/.env` `AIOSTREAMS_AUTH_USERNAME` /
+  `AIOSTREAMS_AUTH_PASSWORD`
 - Public URLs: `caddy/.env` domains and each app's own base URL
 
 `.env` files are git-ignored, never commit them. The `.env.example` files
