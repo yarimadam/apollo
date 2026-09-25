@@ -16,7 +16,8 @@ services:
       SLICKSYNC_PRIVATE_PASSWORD: "${SLICKSYNC_PASSWORD:?}"
       PUBLIC_APP_URL: "${SLICKSYNC_PUBLIC_APP_URL}"
       # Now Playing via AIOStreams' live-streams dashboard. That endpoint is
-      # admin-only, so this is a dedicated AIOStreams admin login.
+      # admin-only, so this is a dedicated AIOStreams admin login, listed in
+      # AIOSTREAMS_AUTH.
       AIOSTREAMS_URL: "http://aiostreams:3000"
       AIOSTREAMS_AUTH_USERNAME: "${SLICKSYNC_AIOSTREAMS_USERNAME:?}"
       AIOSTREAMS_AUTH_PASSWORD: "${SLICKSYNC_AIOSTREAMS_PASSWORD:?}"

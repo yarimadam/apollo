@@ -13,8 +13,7 @@ services:
       SECRET_KEY: "${AIOSTREAMS_SECRET_KEY}"
       DATABASE_URI: "sqlite://./data/db.sqlite"
       REDIS_URI: "redis://:${REDIS_PASSWORD:?}@redis:6379"
-      # Second entry is SlickSync's own login for its Now Playing poller.
-      AIOSTREAMS_AUTH: "${AIOSTREAMS_AUTH:?},${SLICKSYNC_AIOSTREAMS_USERNAME:?}:${SLICKSYNC_AIOSTREAMS_PASSWORD:?}"
+      AIOSTREAMS_AUTH: "${AIOSTREAMS_AUTH:?}"
       AIOSTREAMS_AUTH_REQUIRED: "true"
     logging:
       driver: json-file
