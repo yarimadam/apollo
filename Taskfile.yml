@@ -14,79 +14,79 @@ tasks:
     desc: Start Portainer
     deps: [network]
     cmds:
-      - docker compose --env-file .env -f portainer/compose.yaml up -d
+      - docker compose --env-file portainer/.env -f portainer/compose.yaml up -d
 
   down:portainer:
     desc: Stop Portainer
     cmds:
-      - docker compose --env-file .env -f portainer/compose.yaml down
+      - docker compose --env-file portainer/.env -f portainer/compose.yaml down
 
   up:aiometadata:
     desc: Start AIOMetadata
     deps: [network, up:redis]
     cmds:
-      - docker compose --env-file .env -f aiometadata/compose.yaml up -d
+      - docker compose --env-file aiometadata/.env -f aiometadata/compose.yaml up -d
 
   down:aiometadata:
     desc: Stop AIOMetadata
     cmds:
-      - docker compose --env-file .env -f aiometadata/compose.yaml down
+      - docker compose --env-file aiometadata/.env -f aiometadata/compose.yaml down
 
   up:aiostreams:
     desc: Start AIOStreams
     deps: [network, up:redis]
     cmds:
-      - docker compose --env-file .env -f aiostreams/compose.yaml up -d
+      - docker compose --env-file aiostreams/.env -f aiostreams/compose.yaml up -d
 
   down:aiostreams:
     desc: Stop AIOStreams
     cmds:
-      - docker compose --env-file .env -f aiostreams/compose.yaml down
+      - docker compose --env-file aiostreams/.env -f aiostreams/compose.yaml down
 
   up:slicksync:
     desc: Start SlickSync
     deps: [network]
     cmds:
-      - docker compose --env-file .env -f slicksync/compose.yaml up -d
+      - docker compose --env-file slicksync/.env -f slicksync/compose.yaml up -d
 
   down:slicksync:
     desc: Stop SlickSync
     cmds:
-      - docker compose --env-file .env -f slicksync/compose.yaml down
+      - docker compose --env-file slicksync/.env -f slicksync/compose.yaml down
 
   up:redis:
     desc: Start Redis
     run: once
     deps: [network]
     cmds:
-      - docker compose --env-file .env -f redis/compose.yaml up -d
+      - docker compose --env-file redis/.env -f redis/compose.yaml up -d
 
   down:redis:
     desc: Stop Redis
     cmds:
-      - docker compose --env-file .env -f redis/compose.yaml down
+      - docker compose --env-file redis/.env -f redis/compose.yaml down
 
   up:caddy:
     desc: Start Caddy
     deps: [network]
     cmds:
-      - docker compose --env-file .env -f caddy/compose.yaml up -d
+      - docker compose --env-file caddy/.env -f caddy/compose.yaml up -d
 
   down:caddy:
     desc: Stop Caddy
     cmds:
-      - docker compose --env-file .env -f caddy/compose.yaml down
+      - docker compose --env-file caddy/.env -f caddy/compose.yaml down
 
   up:backup:
     desc: Start backups (restic, dedicated container per job)
     deps: [network]
     cmds:
-      - docker compose --env-file .env -f backup/compose.yaml up -d
+      - docker compose --env-file backup/.env -f backup/compose.yaml up -d
 
   down:backup:
     desc: Stop backups
     cmds:
-      - docker compose --env-file .env -f backup/compose.yaml down
+      - docker compose --env-file backup/.env -f backup/compose.yaml down
 
   up:
     desc: Start all services

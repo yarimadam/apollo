@@ -31,8 +31,8 @@ Tailscale IP. There's no fallback for running this without a tailnet.
 - Caddy in front of the public sites, with real Let's Encrypt certs
 - Portainer for container management, reachable only over the tailnet at
   `https://<tailscale-ip>:9443`
-- Automated restic backup/prune/check jobs, covering `.env` alongside every
-  service's data volume; local by default, optionally offsite (e.g.
+- Automated restic backup/prune/check jobs, covering every service's `.env`
+  alongside its data volume; local by default, optionally offsite (e.g.
   Cloudflare R2)
 - One `compose.yaml` per service, sharing an external Docker network
 - Pinned image versions everywhere, no floating `latest` tags
@@ -59,10 +59,10 @@ Tailscale IP. There's no fallback for running this without a tailnet.
    Tailscale ────────────▶ Portainer :9443 (internal only)
 ```
 
-Every service lives in its own folder with its own `compose.yaml`, all
-attached to one external `apollo` Docker network and sharing a single root
-`.env` file. There's no monolithic compose file; spin services up and down
-independently, or all together.
+Every service lives in its own folder with its own `compose.yaml` and
+`.env`, all attached to one external `apollo` Docker network. There's no
+monolithic compose file; spin services up and down independently, or all
+together.
 
 Caddy additionally joins `apollo_edge`, an IPv6-enabled network that carries
 its published ports. Docker then forwards IPv6 clients by kernel NAT instead
@@ -96,7 +96,8 @@ traffic to debrid/usenet services on a single address.
 ```sh
 git clone <this-repo>
 cd apollo
-cp .env.example .env   # fill in your domains, IPs, and secrets
+for d in */; do [ -f "$d.env.example" ] && cp "$d.env.example" "$d.env"; done
+# fill in each */.env with your domains, IPs, and secrets
 task up
 ```
 
@@ -115,21 +116,31 @@ task --list                # see all available tasks
 
 ## Configuration
 
-All configuration lives in a single root `.env` file (see `.env.example` for
-the full, documented template). Key things you'll want to set:
+Each service reads only its own `<service>/.env` (see the `.env.example`
+next to it for the full, documented template), so every `compose.yaml` runs
+on its own. Key things you'll want to set:
 
-- `PORTAINER_INTERFACE`: the host's Tailscale IP (`tailscale ip -4`);
-  Portainer binds here only
-- `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN` / `SLICKSYNC_DOMAIN`: public
-  hostnames for each service
-- `CADDY_TLS`: `tls internal` for local dev, empty in production
+- `portainer/.env` `PORTAINER_INTERFACE`: the host's Tailscale IP
+  (`tailscale ip -4`); Portainer binds here only
+- `caddy/.env` `AIOSTREAMS_DOMAIN` / `AIOMETADATA_DOMAIN` /
+  `SLICKSYNC_DOMAIN`: public hostnames for each service
+- `caddy/.env` `CADDY_TLS`: `tls internal` for local dev, empty in production
   (real Let's Encrypt certs, issued automatically)
-- `RESTIC_PASSWORD`: encrypts your backup repository
-- `RESTIC_REPOSITORY`: optional restic backend URL for offsite backups (e.g.
-  Cloudflare R2); leave empty for local-only
+- `backup/.env` `RESTIC_PASSWORD`: encrypts your backup repository
+- `backup/.env` `RESTIC_REPOSITORY`: optional restic backend URL for offsite
+  backups (e.g. Cloudflare R2); leave empty for local-only
 
-`.env` is git-ignored, never commit it. `.env.example` is the tracked,
-secret-free template.
+A few values describe a connection between two services, so they must be
+set to the same value in both files:
+
+- `REDIS_PASSWORD`: in `redis/.env`, `aiostreams/.env` and `aiometadata/.env`
+- SlickSync's AIOStreams login: one `user:pass` entry of `aiostreams/.env`
+  `AIOSTREAMS_AUTH`, and `slicksync/.env` `SLICKSYNC_AIOSTREAMS_USERNAME` /
+  `SLICKSYNC_AIOSTREAMS_PASSWORD`
+- Public URLs: `caddy/.env` domains and each app's own base URL
+
+`.env` files are git-ignored, never commit them. The `.env.example` files
+are the tracked, secret-free templates.
 
 See [RECOVERY.md](RECOVERY.md) for restoring the stack onto a fresh server
 from backup.

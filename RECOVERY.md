@@ -78,17 +78,19 @@ on the same disk as everything else it backs up.
      mazzolino/restic:1.8.2 restic restore latest --target /
    ```
 
-   Either way, this also drops the backed-up `.env` into
-   `./restore-env/.env`.
+   Either way, this also drops every service's backed-up `.env` into
+   `./restore-env/<service>/.env`.
 
-4. Move `.env` into place:
+4. Move the `.env` files into place:
    ```sh
-   cp restore-env/.env .env && rm -rf restore-env
+   cp -R restore-env/. . && rm -rf restore-env
    ```
 
-5. Update the values in `.env` that are inherently tied to the old host:
-   - `PORTAINER_INTERFACE`: the new server's Tailscale IP (`tailscale ip -4`).
-   - `SLICKSYNC_AIOSTREAMS_IGNORE_IPS`: the new server's public IP(s), if set.
+5. Update the values that are inherently tied to the old host:
+   - `portainer/.env` `PORTAINER_INTERFACE`: the new server's Tailscale IP
+     (`tailscale ip -4`).
+   - `slicksync/.env` `SLICKSYNC_AIOSTREAMS_IGNORE_IPS`: the new server's
+     public IP(s), if set.
 
 6. Bring the stack up:
    ```sh

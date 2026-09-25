@@ -32,7 +32,13 @@ services:
       - aiostreams_data:/mnt/volumes/aiostreams:ro
       - aiometadata_data:/mnt/volumes/aiometadata:ro
       - slicksync_data:/mnt/volumes/slicksync:ro
-      - ../.env:/mnt/volumes/env/.env:ro
+      - ../portainer/.env:/mnt/volumes/env/portainer/.env:ro
+      - ../caddy/.env:/mnt/volumes/env/caddy/.env:ro
+      - ../redis/.env:/mnt/volumes/env/redis/.env:ro
+      - ../aiostreams/.env:/mnt/volumes/env/aiostreams/.env:ro
+      - ../aiometadata/.env:/mnt/volumes/env/aiometadata/.env:ro
+      - ../slicksync/.env:/mnt/volumes/env/slicksync/.env:ro
+      - ../backup/.env:/mnt/volumes/env/backup/.env:ro
       - ./restic-repo:/mnt/restic
     networks:
       - apollo
