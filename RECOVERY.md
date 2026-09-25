@@ -35,7 +35,7 @@ on the same disk as everything else it backs up.
    created them; without them, Compose warns on every start that the volume
    "was not created by Docker Compose":
    ```sh
-   for s in portainer caddy aiostreams aiometadata slicksync; do
+   for s in portainer traefik aiostreams aiometadata slicksync; do
      docker volume create \
        --label com.docker.compose.project=$s \
        --label com.docker.compose.volume=data \
@@ -55,7 +55,7 @@ on the same disk as everything else it backs up.
    docker run --rm \
      -e RESTIC_REPOSITORY -e RESTIC_PASSWORD -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY \
      -v portainer_data:/mnt/volumes/portainer \
-     -v caddy_data:/mnt/volumes/caddy \
+     -v traefik_data:/mnt/volumes/traefik \
      -v aiostreams_data:/mnt/volumes/aiostreams \
      -v aiometadata_data:/mnt/volumes/aiometadata \
      -v slicksync_data:/mnt/volumes/slicksync \
@@ -71,7 +71,7 @@ on the same disk as everything else it backs up.
      -e RESTIC_REPOSITORY=/mnt/restic -e RESTIC_PASSWORD \
      -v "$(pwd)/backup/restic-repo:/mnt/restic:ro" \
      -v portainer_data:/mnt/volumes/portainer \
-     -v caddy_data:/mnt/volumes/caddy \
+     -v traefik_data:/mnt/volumes/traefik \
      -v aiostreams_data:/mnt/volumes/aiostreams \
      -v aiometadata_data:/mnt/volumes/aiometadata \
      -v slicksync_data:/mnt/volumes/slicksync \
@@ -88,8 +88,8 @@ on the same disk as everything else it backs up.
    ```
 
 5. Update the values that are inherently tied to the old host:
-   - `portainer/.env` `INTERFACE`: the new server's Tailscale IP
-     (`tailscale ip -4`).
+   - `portainer/.env` and `traefik/.env` `INTERFACE`: the new server's
+     Tailscale IP (`tailscale ip -4`).
    - `slicksync/.env` `AIOSTREAMS_IGNORE_IPS`: the new server's
      public IP(s), if set.
 
@@ -97,9 +97,8 @@ on the same disk as everything else it backs up.
    ```sh
    task up
    ```
-   Caddy re-fetches Let's Encrypt certs for the external sites as needed,
-   usually immediately since `caddy_data` (holding prior cert state) was
-   restored.
+   Traefik reuses the restored certs in `traefik_data` (`acme.json`) and
+   only renews them when they're due.
 
 7. Re-apply what lives outside the repo, since none of it was backed up:
    - Provider firewall rules (allow 443/tcp, 80/tcp, 443/udp, 41641/udp
@@ -115,4 +114,5 @@ on the same disk as everything else it backs up.
    curl -I https://<AIOMETADATA_DOMAIN>
    curl -I https://<SLICKSYNC_DOMAIN>
    ```
-   Confirm Portainer loads over the tailnet at `https://<tailscale-ip>:9443`.
+   Confirm Portainer and the Traefik dashboard load over the tailnet at
+   `https://<tailscale-ip>:9443` and `https://<tailscale-ip>:8443/dashboard/`.
