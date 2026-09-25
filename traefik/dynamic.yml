@@ -4,7 +4,7 @@ http:
     aiostreams:
       rule: 'Host(`{{ env "AIOSTREAMS_DOMAIN" }}`)'
       entryPoints: [websecure]
-      middlewares: [security]
+      middlewares: [security, authelia]
       service: aiostreams
       tls:
         certResolver: '{{ $certResolver }}'
@@ -12,7 +12,7 @@ http:
     aiometadata:
       rule: 'Host(`{{ env "AIOMETADATA_DOMAIN" }}`)'
       entryPoints: [websecure]
-      middlewares: [security]
+      middlewares: [security, authelia]
       service: aiometadata
       tls:
         certResolver: '{{ $certResolver }}'
@@ -20,7 +20,7 @@ http:
     slicksync:
       rule: 'Host(`{{ env "SLICKSYNC_DOMAIN" }}`)'
       entryPoints: [websecure]
-      middlewares: [security]
+      middlewares: [security, authelia]
       service: slicksync
       tls:
         certResolver: '{{ $certResolver }}'
@@ -53,6 +53,19 @@ http:
     noframe:
       headers:
         frameDeny: true
+
+    # Authelia's access_control decides per path: config and admin pages need
+    # two-factor, the addon endpoints clients call are bypassed.
+    authelia:
+      forwardAuth:
+        address: http://authelia:9091/api/authz/forward-auth
+        trustForwardHeader: false
+        maxResponseBodySize: 65536
+        authResponseHeaders:
+          - Remote-User
+          - Remote-Groups
+          - Remote-Email
+          - Remote-Name
 
   services:
     aiostreams:

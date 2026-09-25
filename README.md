@@ -33,6 +33,8 @@ fallback for running this without a tailnet.
   accounts, with live Now Playing from AIOStreams' stream dashboard
 - Traefik in front of the public sites, with real Let's Encrypt certs. Its
   routes live in one file, so it never gets the Docker socket
+- Authelia two-factor login (TOTP or passkey) in front of the addons' config
+  and admin pages; the endpoints Stremio/Nuvio clients call stay open
 - Traefik's dashboard, reachable only over the tailnet at
   `https://<tailscale-ip>:8443/dashboard/`
 - Portainer for container management, reachable only over the tailnet at
@@ -55,12 +57,14 @@ fallback for running this without a tailnet.
                          │ (reverse     │──────▶ AIOMetadata (external)
                          │  proxy)      │──────▶ SlickSync (external)
                          └──────────────┘──────▶ Authelia (login portal)
+                                │   ▲
+                   forward-auth └───┘ Authelia
                                 │
                          apollo network
                                 │
-                    ┌───────────────────────┐
-                    │  Redis  │  Backups     │
-                    └───────────────────────┘
+                    ┌────────────────────────┐
+                    │  Redis  │  Backups      │
+                    └────────────────────────┘
 
    Tailscale ────────────▶ Portainer :9443 (internal only)
    Tailscale ────────────▶ Traefik dashboard :8443 (internal only)
@@ -76,6 +80,13 @@ its published ports. Docker then forwards IPv6 clients by kernel NAT instead
 of through `docker-proxy`, so Traefik (and the addons behind it) see real client
 addresses on IPv6 too. The addons stay IPv4-only, which keeps their outbound
 traffic to debrid/usenet services on a single address.
+
+Traefik asks Authelia about every request to an addon. Authelia requires a
+two-factor login for `/`, `*/configure` and `*/dashboard`/`*/admin` pages and
+lets everything else through, since Stremio/Nuvio clients and SlickTrax
+devices call the addon endpoints without a browser. The apps' own logins
+stay on behind it. The login portal on `AUTH_DOMAIN` has to be public so
+users can sign in; Authelia itself publishes no ports and has no admin UI.
 
 ## Services
 

@@ -9,19 +9,26 @@ accessLog: {}
 
 # No forwardedHeaders.trustedIPs: Traefik is the edge, so client-supplied
 # X-Forwarded-* headers are always overwritten, never trusted.
+# aliasHeadersStrategy drops e.g. Remote_User, which some backends read as
+# Remote-User, so clients can't spoof the headers Authelia sets.
 entryPoints:
   web:
     address: ":80"
     http:
+      aliasHeadersStrategy: delete
       redirections:
         entryPoint:
           to: websecure
           scheme: https
   websecure:
     address: ":443"
+    http:
+      aliasHeadersStrategy: delete
     http3: {}
   admin:
     address: ":8443"
+    http:
+      aliasHeadersStrategy: delete
 
 api:
   dashboard: true
