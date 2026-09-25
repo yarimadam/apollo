@@ -88,6 +88,7 @@ on the same disk as everything else it backs up.
 
 5. Update the values in `.env` that are inherently tied to the old host:
    - `PORTAINER_INTERFACE`: the new server's Tailscale IP (`tailscale ip -4`).
+   - `SLICKSYNC_AIOSTREAMS_IGNORE_IPS`: the new server's public IP(s), if set.
 
 6. Bring the stack up:
    ```sh

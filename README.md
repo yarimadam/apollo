@@ -27,7 +27,7 @@ Tailscale IP. There's no fallback for running this without a tailnet.
 - AIOStreams: unified streaming addon for Stremio/Nuvio clients
 - AIOMetadata: metadata addon
 - SlickSync: addon, user and credential management across Stremio/Nuvio
-  accounts
+  accounts, with live Now Playing from AIOStreams' stream dashboard
 - Caddy in front of the public sites, with real Let's Encrypt certs
 - Portainer for container management, reachable only over the tailnet at
   `https://<tailscale-ip>:9443`
