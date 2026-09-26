@@ -104,6 +104,9 @@ on the same disk as everything else it backs up.
      inbound, deny the rest).
    - DNS: if the server's public IP changed, update `AIOSTREAMS_DOMAIN` /
      `AIOMETADATA_DOMAIN` / `AIOMANAGER_DOMAIN`'s A/AAAA records.
+   - Swap, on small-RAM hosts: a 2 GB `/swapfile` in `/etc/fstab` and
+     `vm.swappiness=10` in `/etc/sysctl.d/`, so a memory spike slows the
+     addons down instead of getting one OOM-killed.
 
 8. Verify:
    ```sh
