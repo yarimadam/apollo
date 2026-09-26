@@ -1,7 +1,7 @@
 services:
-  traefik:
-    image: traefik:v3.7.13
-    container_name: traefik
+  caddy:
+    image: caddy:2.11.4
+    container_name: caddy
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -10,14 +10,14 @@ services:
     cap_add:
       - NET_BIND_SERVICE
     read_only: true
+    tmpfs:
+      - /config
     pids_limit: 256
-    # Read by the templates in dynamic.yml.
     environment:
-      CERT_RESOLVER: "${CERT_RESOLVER}"
       AIOSTREAMS_DOMAIN: "${AIOSTREAMS_DOMAIN:?}"
       AIOMETADATA_DOMAIN: "${AIOMETADATA_DOMAIN:?}"
       SLICKSYNC_DOMAIN: "${SLICKSYNC_DOMAIN:?}"
-      AUTH_DOMAIN: "${AUTH_DOMAIN:?}"
+      TLS: "${TLS}"
     logging:
       driver: json-file
       options:
@@ -27,15 +27,13 @@ services:
       - "${HTTPS_PORT:?}:443"
       - "${HTTPS_PORT:?}:443/udp"
       - "${HTTP_PORT:?}:80"
-      # Tailscale-only. Traefik dashboard (self-signed cert).
-      - "${INTERFACE:?}:8443:8443"
     volumes:
-      - ./traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./robots.txt:/etc/caddy/static/robots.txt:ro
       - data:/data
     networks:
       apollo: {}
-      # IPv6-enabled; carries the published ports and Traefik's default route.
+      # IPv6-enabled; carries the published ports and Caddy's default route.
       # The apps stay IPv4-only on apollo, so their outbound traffic is unchanged.
       apollo_edge:
         gw_priority: 1

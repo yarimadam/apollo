@@ -6,7 +6,7 @@ tasks:
     silent: true
     cmds:
       - docker network inspect apollo >/dev/null 2>&1 || docker network create apollo
-      # Dual-stack, Traefik only: published ports get kernel DNAT on IPv6 too,
+      # Dual-stack, Caddy only: published ports get kernel DNAT on IPv6 too,
       # instead of docker-proxy, which hides the real client address.
       - docker network inspect apollo_edge >/dev/null 2>&1 || docker network create --ipv6 apollo_edge
 
@@ -66,27 +66,16 @@ tasks:
     cmds:
       - docker compose --env-file redis/.env -f redis/compose.yaml down
 
-  up:authelia:
-    desc: Start Authelia
-    deps: [network, up:redis]
-    cmds:
-      - docker compose --env-file authelia/.env -f authelia/compose.yaml up -d
-
-  down:authelia:
-    desc: Stop Authelia
-    cmds:
-      - docker compose --env-file authelia/.env -f authelia/compose.yaml down
-
-  up:traefik:
-    desc: Start Traefik
+  up:caddy:
+    desc: Start Caddy
     deps: [network]
     cmds:
-      - docker compose --env-file traefik/.env -f traefik/compose.yaml up -d
+      - docker compose --env-file caddy/.env -f caddy/compose.yaml up -d
 
-  down:traefik:
-    desc: Stop Traefik
+  down:caddy:
+    desc: Stop Caddy
     cmds:
-      - docker compose --env-file traefik/.env -f traefik/compose.yaml down
+      - docker compose --env-file caddy/.env -f caddy/compose.yaml down
 
   up:backup:
     desc: Start backups (restic, dedicated container per job)
@@ -107,16 +96,14 @@ tasks:
       - task: up:aiometadata
       - task: up:aiostreams
       - task: up:slicksync
-      - task: up:authelia
-      - task: up:traefik
+      - task: up:caddy
       - task: up:backup
 
   down:
     desc: Stop all services
     cmds:
       - task: down:backup
-      - task: down:traefik
-      - task: down:authelia
+      - task: down:caddy
       - task: down:slicksync
       - task: down:aiostreams
       - task: down:aiometadata

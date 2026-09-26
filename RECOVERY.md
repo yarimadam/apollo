@@ -29,14 +29,13 @@ on the same disk as everything else it backs up.
 
 2. Pre-create the named volumes, empty. Don't start the app containers yet;
    restoring after they've initialized can conflict with the old data
-   (`aiostreams/.env` `SECRET_KEY` and `authelia/.env`
-   `AUTHELIA_STORAGE_ENCRYPTION_KEY` in particular are tied to the restored
-   data).
+   (`aiostreams/.env` `SECRET_KEY` in particular is tied to the restored
+   configs).
    The labels mark them as Compose's own, as if `docker compose up` had
    created them; without them, Compose warns on every start that the volume
    "was not created by Docker Compose":
    ```sh
-   for s in portainer traefik authelia aiostreams aiometadata slicksync; do
+   for s in portainer caddy aiostreams aiometadata slicksync; do
      docker volume create \
        --label com.docker.compose.project=$s \
        --label com.docker.compose.volume=data \
@@ -56,8 +55,7 @@ on the same disk as everything else it backs up.
    docker run --rm \
      -e RESTIC_REPOSITORY -e RESTIC_PASSWORD -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY \
      -v portainer_data:/mnt/volumes/portainer \
-     -v traefik_data:/mnt/volumes/traefik \
-     -v authelia_data:/mnt/volumes/authelia \
+     -v caddy_data:/mnt/volumes/caddy \
      -v aiostreams_data:/mnt/volumes/aiostreams \
      -v aiometadata_data:/mnt/volumes/aiometadata \
      -v slicksync_data:/mnt/volumes/slicksync \
@@ -73,8 +71,7 @@ on the same disk as everything else it backs up.
      -e RESTIC_REPOSITORY=/mnt/restic -e RESTIC_PASSWORD \
      -v "$(pwd)/backup/restic-repo:/mnt/restic:ro" \
      -v portainer_data:/mnt/volumes/portainer \
-     -v traefik_data:/mnt/volumes/traefik \
-     -v authelia_data:/mnt/volumes/authelia \
+     -v caddy_data:/mnt/volumes/caddy \
      -v aiostreams_data:/mnt/volumes/aiostreams \
      -v aiometadata_data:/mnt/volumes/aiometadata \
      -v slicksync_data:/mnt/volumes/slicksync \
@@ -83,19 +80,16 @@ on the same disk as everything else it backs up.
    ```
 
    Either way, this also drops every service's backed-up `.env` into
-   `./restore-env/<service>/.env`, and Authelia's users into
-   `./restore-env/authelia/users.yml`. Restore volumes and `.env` files
-   from the same snapshot: Authelia's database only opens with the
-   encryption key it was written with.
+   `./restore-env/<service>/.env`.
 
-4. Move the `.env` files and `users.yml` into place:
+4. Move the `.env` files into place:
    ```sh
    cp -R restore-env/. . && rm -rf restore-env
    ```
 
 5. Update the values that are inherently tied to the old host:
-   - `portainer/.env` and `traefik/.env` `INTERFACE`: the new server's
-     Tailscale IP (`tailscale ip -4`).
+   - `portainer/.env` `INTERFACE`: the new server's Tailscale IP
+     (`tailscale ip -4`).
    - `slicksync/.env` `AIOSTREAMS_IGNORE_IPS`: the new server's
      public IP(s), if set.
 
@@ -103,15 +97,15 @@ on the same disk as everything else it backs up.
    ```sh
    task up
    ```
-   Traefik reuses the restored certs in `traefik_data` (`acme.json`) and
-   only renews them when they're due.
+   Caddy re-fetches Let's Encrypt certs for the external sites as needed,
+   usually immediately since `caddy_data` (holding prior cert state) was
+   restored.
 
 7. Re-apply what lives outside the repo, since none of it was backed up:
    - Provider firewall rules (allow 443/tcp, 80/tcp, 443/udp, 41641/udp
      inbound, deny the rest).
    - DNS: if the server's public IP changed, update `AIOSTREAMS_DOMAIN` /
-     `AIOMETADATA_DOMAIN` / `SLICKSYNC_DOMAIN` / `AUTH_DOMAIN`'s A/AAAA
-     records.
+     `AIOMETADATA_DOMAIN` / `SLICKSYNC_DOMAIN`'s A/AAAA records.
 
 8. Verify:
    ```sh
@@ -120,8 +114,5 @@ on the same disk as everything else it backs up.
    curl -I https://<AIOSTREAMS_DOMAIN>
    curl -I https://<AIOMETADATA_DOMAIN>
    curl -I https://<SLICKSYNC_DOMAIN>
-   curl -I https://<AUTH_DOMAIN>
    ```
-   Confirm Portainer and the Traefik dashboard load over the tailnet at
-   `https://<tailscale-ip>:9443` and `https://<tailscale-ip>:8443/dashboard/`,
-   and that an existing two-factor login still works.
+   Confirm Portainer loads over the tailnet at `https://<tailscale-ip>:9443`.
