@@ -36,12 +36,12 @@
 	}
 }
 
-{$SLICKSYNC_DOMAIN} {
+{$AIOMANAGER_DOMAIN} {
 	{$TLS}
 	import security
 	import noindex
 
 	handle {
-		reverse_proxy slicksync:3000
+		reverse_proxy aiomanager:1610
 	}
 }

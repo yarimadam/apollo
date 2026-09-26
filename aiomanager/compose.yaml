@@ -1,0 +1,44 @@
+services:
+  aiomanager:
+    image: ghcr.io/sonicx161/aiomanager:2.0.0
+    container_name: aiomanager
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    pids_limit: 512
+    environment:
+      # Without it, a key is generated into the volume on first boot.
+      ENCRYPTION_KEY: "${ENCRYPTION_KEY:?}"
+      REGISTRATIONS_CLOSED: "${REGISTRATIONS_CLOSED:?}"
+      CORS_ORIGINS: "${CORS_ORIGINS:?}"
+      # Caddy overwrites X-Forwarded-For with the real client address, so it
+      # can't be spoofed; without this all clients share one rate-limit bucket.
+      TRUST_PROXY: "true"
+      LOG_PRETTY_PRINT: "false"
+    # The image ships no HEALTHCHECK; this is upstream's own probe.
+    healthcheck:
+      test: ["CMD", "/nodejs/bin/node", "server/healthcheck.js"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # SQLite database with the synced (encrypted) account data.
+    volumes:
+      - data:/app/data
+    networks:
+      - apollo
+
+volumes:
+  data:
+
+networks:
+  apollo:
+    external: true
