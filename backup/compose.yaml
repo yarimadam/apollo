@@ -24,7 +24,10 @@ services:
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
       RESTIC_BACKUP_SOURCES: /mnt/volumes
       RESTIC_BACKUP_ARGS: "--tag apollo"
-      RESTIC_FORGET_ARGS: "--group-by tags --keep-daily 7 --keep-weekly 4 --keep-monthly 6"
+      # --keep-last: keep-daily keeps only a day's newest snapshot, so a
+      # startup or manual backup would drop that day's earlier one (e.g. the
+      # snapshot taken right before a deploy).
+      RESTIC_FORGET_ARGS: "--group-by tags --keep-last 5 --keep-daily 7 --keep-weekly 4 --keep-monthly 6"
       TZ: UTC
     volumes:
       - portainer_data:/mnt/volumes/portainer:ro
