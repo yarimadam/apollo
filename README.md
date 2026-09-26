@@ -25,7 +25,8 @@ Tailscale IP. There's no fallback for running this without a tailnet.
 ## Features
 
 - AIOStreams: unified streaming addon for Stremio/Nuvio clients
-- AIOMetadata: metadata addon
+- AIOMetadata: metadata addon, with its built-in image cache on a separate
+  volume that backups skip, since the images can be re-downloaded
 - AIOManager: addon management and sync across Stremio/Nuvio accounts,
   with registrations closed once your own account exists
 - Caddy in front of the public sites, with real Let's Encrypt certs

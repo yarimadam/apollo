@@ -14,6 +14,11 @@ services:
       REDIS_URL: "redis://:${REDIS_PASSWORD:?}@redis:6379"
       ADMIN_KEY: "${ADMIN_KEY}"
       ADDON_PASSWORD: "${ADDON_PASSWORD}"
+      # Serves artwork from local disk at /poster-cache instead of re-fetching
+      # it upstream. Kept out of data (the default) so up to
+      # POSTER_CACHE_MAX_SIZE of re-downloadable images stays out of backups.
+      ENABLE_BUILTIN_POSTER_CACHE: "true"
+      POSTER_CACHE_DIR: /app/poster-cache
     logging:
       driver: json-file
       options:
@@ -21,11 +26,13 @@ services:
         max-file: "3"
     volumes:
       - data:/app/addon/data
+      - cache:/app/poster-cache
     networks:
       - apollo
 
 volumes:
   data:
+  cache:
 
 networks:
   apollo:
